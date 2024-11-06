@@ -1,0 +1,419 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+      "title": "Retriever API's for AI Virtual Assistant for Customer Service",
+      "description": "This API schema describes all the retriever endpoints exposed for the AI Virtual Assistant for Customer Service NIM Blueprint",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/health": {
+        "get": {
+          "tags": [
+            "Health"
+          ],
+          "summary": "Health Check",
+          "description": "Perform a Health Check\n\nReturns 200 when service is up. This does not check the health of downstream services.",
+          "operationId": "health_check_health_get",
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HealthResponse"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal Server Error",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "detail": "Internal server error occurred"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/documents": {
+        "post": {
+          "tags": [
+            "Core"
+          ],
+          "summary": "Upload Document",
+          "description": "Upload a document to the vector store.",
+          "operationId": "upload_document_documents_post",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "$ref": "#/components/schemas/Body_upload_document_documents_post"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {}
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal Server Error",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "detail": "Internal server error occurred"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "get": {
+          "tags": [
+            "Management"
+          ],
+          "summary": "Get Documents",
+          "description": "List available documents.",
+          "operationId": "get_documents_documents_get",
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/DocumentsResponse"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal Server Error",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "detail": "Internal server error occurred"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "Management"
+          ],
+          "summary": "Delete Document",
+          "description": "Delete a document.",
+          "operationId": "delete_document_documents_delete",
+          "parameters": [
+            {
+              "name": "filename",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "title": "Filename"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {}
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal Server Error",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "detail": "Internal server error occurred"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/search": {
+        "post": {
+          "tags": [
+            "Core"
+          ],
+          "summary": "Document Search",
+          "description": "Search for the most relevant documents for the given search parameters.",
+          "operationId": "document_search_search_post",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentSearch"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/DocumentSearchResponse"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal Server Error",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "detail": "Internal server error occurred"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Body_upload_document_documents_post": {
+          "properties": {
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "title": "File"
+            }
+          },
+          "type": "object",
+          "required": [
+            "file"
+          ],
+          "title": "Body_upload_document_documents_post"
+        },
+        "DocumentChunk": {
+          "properties": {
+            "content": {
+              "type": "string",
+              "maxLength": 131072,
+              "pattern": "[\\s\\S]*",
+              "title": "Content",
+              "description": "The content of the document chunk.",
+              "default": ""
+            },
+            "filename": {
+              "type": "string",
+              "maxLength": 4096,
+              "pattern": "[\\s\\S]*",
+              "title": "Filename",
+              "description": "The name of the file the chunk belongs to.",
+              "default": ""
+            },
+            "score": {
+              "type": "number",
+              "title": "Score",
+              "description": "The relevance score of the chunk."
+            }
+          },
+          "type": "object",
+          "required": [
+            "score"
+          ],
+          "title": "DocumentChunk",
+          "description": "Represents a chunk of a document."
+        },
+        "DocumentSearch": {
+          "properties": {
+            "query": {
+              "type": "string",
+              "maxLength": 131072,
+              "pattern": "[\\s\\S]*",
+              "title": "Query",
+              "description": "The content or keywords to search for within documents.",
+              "default": ""
+            },
+            "top_k": {
+              "type": "integer",
+              "maximum": 25.0,
+              "minimum": 0.0,
+              "format": "int64",
+              "title": "Top K",
+              "description": "The maximum number of documents to return in the response.",
+              "default": 4
+            },
+            "user_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id",
+              "description": "An optional unique identifier for the customer."
+            }
+          },
+          "type": "object",
+          "title": "DocumentSearch",
+          "description": "Definition of the DocumentSearch API data type."
+        },
+        "DocumentSearchResponse": {
+          "properties": {
+            "chunks": {
+              "items": {
+                "$ref": "#/components/schemas/DocumentChunk"
+              },
+              "type": "array",
+              "maxItems": 256,
+              "title": "Chunks",
+              "description": "List of document chunks."
+            }
+          },
+          "type": "object",
+          "required": [
+            "chunks"
+          ],
+          "title": "DocumentSearchResponse",
+          "description": "Represents a response from a document search."
+        },
+        "DocumentsResponse": {
+          "properties": {
+            "documents": {
+              "items": {
+                "type": "string",
+                "maxLength": 131072,
+                "pattern": "[\\s\\S]*"
+              },
+              "type": "array",
+              "maxItems": 1000000,
+              "title": "Documents",
+              "description": "List of filenames.",
+              "default": []
+            }
+          },
+          "type": "object",
+          "title": "DocumentsResponse",
+          "description": "Represents the response containing a list of documents."
+        },
+        "HTTPValidationError": {
+          "properties": {
+            "detail": {
+              "items": {
+                "$ref": "#/components/schemas/ValidationError"
+              },
+              "type": "array",
+              "title": "Detail"
+            }
+          },
+          "type": "object",
+          "title": "HTTPValidationError"
+        },
+        "HealthResponse": {
+          "properties": {
+            "message": {
+              "type": "string",
+              "maxLength": 4096,
+              "pattern": "[\\s\\S]*",
+              "title": "Message",
+              "default": ""
+            }
+          },
+          "type": "object",
+          "title": "HealthResponse"
+        },
+        "ValidationError": {
+          "properties": {
+            "loc": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ]
+              },
+              "type": "array",
+              "title": "Location"
+            },
+            "msg": {
+              "type": "string",
+              "title": "Message"
+            },
+            "type": {
+              "type": "string",
+              "title": "Error Type"
+            }
+          },
+          "type": "object",
+          "required": [
+            "loc",
+            "msg",
+            "type"
+          ],
+          "title": "ValidationError"
+        }
+      }
+    },
+    "tags": [
+      {
+        "name": "Health",
+        "description": "APIs for checking and monitoring server liveliness and readiness."
+      },
+      {
+        "name": "Core",
+        "description": "Core APIs for ingestion and searching."
+      },
+      {
+        "name": "Management",
+        "description": "APIs for deleting and listing ingested files."
+      }
+    ]
+  }

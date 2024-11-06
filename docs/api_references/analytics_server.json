@@ -1,0 +1,927 @@
+{
+	"openapi": "3.1.0",
+	"info": {
+	  "title": "Analytics API's for AI Virtual Assistant for Customer Service",
+	  "description": "This API schema describes all the analytics endpoints exposed for the AI Virtual Assistant for Customer Service NIM Blueprint",
+	  "version": "1.0.0"
+	},
+	"paths": {
+	  "/health": {
+		"get": {
+		  "tags": [
+			"Health"
+		  ],
+		  "summary": "Health Check",
+		  "description": "Perform a Health Check\n\nReturns 200 when service is up. This does not check the health of downstream services.",
+		  "operationId": "health_check_health_get",
+		  "responses": {
+			"200": {
+			  "description": "Successful Response",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/HealthResponse"
+				  }
+				}
+			  }
+			},
+			"500": {
+			  "description": "Internal Server Error",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Internal server error occurred"
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  },
+	  "/sessions": {
+		"get": {
+		  "tags": [
+			"Session"
+		  ],
+		  "summary": "Get Sessions",
+		  "description": "Retrieve session information in last k hours",
+		  "operationId": "get_sessions_sessions_get",
+		  "parameters": [
+			{
+			  "name": "hours",
+			  "in": "query",
+			  "required": true,
+			  "schema": {
+				"type": "integer",
+				"description": "Last K hours, for which sessions info is extracted",
+				"title": "Hours"
+			  },
+			  "description": "Last K hours, for which sessions info is extracted"
+			}
+		  ],
+		  "responses": {
+			"200": {
+			  "description": "Successful Response",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"type": "array",
+					"items": {
+					  "$ref": "#/components/schemas/SessionsResponse"
+					},
+					"title": "Response Get Sessions Sessions Get"
+				  }
+				}
+			  }
+			},
+			"404": {
+			  "description": "No Sessions Found",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "No sessions found for the specified time range"
+				  }
+				}
+			  }
+			},
+			"422": {
+			  "description": "Validation Error",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/HTTPValidationError"
+				  }
+				}
+			  }
+			},
+			"500": {
+			  "description": "Internal Server Error",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Internal server error occurred"
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  },
+	  "/session/summary": {
+		"get": {
+		  "tags": [
+			"Session"
+		  ],
+		  "summary": "Generate Session Summary",
+		  "description": "Generate a summary and sentiment analysis for the specified session.",
+		  "operationId": "generate_session_summary_session_summary_get",
+		  "parameters": [
+			{
+			  "name": "session_id",
+			  "in": "query",
+			  "required": true,
+			  "schema": {
+				"type": "string",
+				"description": "The ID of the session",
+				"title": "Session Id"
+			  },
+			  "description": "The ID of the session"
+			}
+		  ],
+		  "responses": {
+			"200": {
+			  "description": "Successful Response",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/SessionSummaryResponse"
+				  }
+				}
+			  }
+			},
+			"404": {
+			  "description": "Session Not Found",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Session not found"
+				  }
+				}
+			  }
+			},
+			"422": {
+			  "description": "Validation Error",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/HTTPValidationError"
+				  }
+				}
+			  }
+			},
+			"500": {
+			  "description": "Internal Server Error",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Internal server error occurred"
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  },
+	  "/session/conversation": {
+		"get": {
+		  "tags": [
+			"Session"
+		  ],
+		  "summary": "Get Session Conversation",
+		  "description": "Retrieve the conversation and sentiment for the specified session.",
+		  "operationId": "get_session_conversation_session_conversation_get",
+		  "parameters": [
+			{
+			  "name": "session_id",
+			  "in": "query",
+			  "required": true,
+			  "schema": {
+				"type": "string",
+				"description": "The ID of the session",
+				"title": "Session Id"
+			  },
+			  "description": "The ID of the session"
+			}
+		  ],
+		  "responses": {
+			"200": {
+			  "description": "Successful Response",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/SessionConversationResponse"
+				  }
+				}
+			  }
+			},
+			"404": {
+			  "description": "Session Not Found",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Session not found"
+				  }
+				}
+			  }
+			},
+			"422": {
+			  "description": "Validation Error",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/HTTPValidationError"
+				  }
+				}
+			  }
+			},
+			"500": {
+			  "description": "Internal Server Error",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Internal server error occurred"
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  },
+	  "/get_user_purchase_history": {
+		"post": {
+		  "tags": [
+			"User Data"
+		  ],
+		  "summary": "Get User Purchase History",
+		  "description": "Get purchase history for user",
+		  "operationId": "get_user_purchase_history_get_user_purchase_history_post",
+		  "parameters": [
+			{
+			  "name": "user_id",
+			  "in": "query",
+			  "required": true,
+			  "schema": {
+				"type": "string",
+				"title": "User Id"
+			  }
+			}
+		  ],
+		  "responses": {
+			"200": {
+			  "description": "Successful Response",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"type": "array",
+					"items": {
+					  "$ref": "#/components/schemas/PurchaseInfo"
+					},
+					"title": "Response Get User Purchase History Get User Purchase History Post"
+				  }
+				}
+			  }
+			},
+			"404": {
+			  "description": "Session Not Found",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Session not found"
+				  }
+				}
+			  }
+			},
+			"422": {
+			  "description": "Validation Error",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/HTTPValidationError"
+				  }
+				}
+			  }
+			},
+			"500": {
+			  "description": "Internal Server Error",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Internal server error occurred"
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  },
+	  "/feedback/sentiment": {
+		"post": {
+		  "tags": [
+			"Feedback"
+		  ],
+		  "summary": "Store Sentiment Feedback",
+		  "description": "Store user feedback for the sentiment analysis of a conversation session.",
+		  "operationId": "store_sentiment_feedback_feedback_sentiment_post",
+		  "requestBody": {
+			"content": {
+			  "application/json": {
+				"schema": {
+				  "$ref": "#/components/schemas/FeedbackRequest"
+				}
+			  }
+			},
+			"required": true
+		  },
+		  "responses": {
+			"200": {
+			  "description": "Successful Response",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/FeedbackResponse"
+				  }
+				}
+			  }
+			},
+			"404": {
+			  "description": "Session Not Found",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Session not found"
+				  }
+				}
+			  }
+			},
+			"422": {
+			  "description": "Validation Error",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/HTTPValidationError"
+				  }
+				}
+			  }
+			},
+			"500": {
+			  "description": "Internal Server Error",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Internal server error occurred"
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  },
+	  "/feedback/summary": {
+		"post": {
+		  "tags": [
+			"Feedback"
+		  ],
+		  "summary": "Store Summary Feedback",
+		  "description": "Store user feedback for the summary of a conversation session.",
+		  "operationId": "store_summary_feedback_feedback_summary_post",
+		  "requestBody": {
+			"content": {
+			  "application/json": {
+				"schema": {
+				  "$ref": "#/components/schemas/FeedbackRequest"
+				}
+			  }
+			},
+			"required": true
+		  },
+		  "responses": {
+			"200": {
+			  "description": "Successful Response",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/FeedbackResponse"
+				  }
+				}
+			  }
+			},
+			"404": {
+			  "description": "Session Not Found",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Session not found"
+				  }
+				}
+			  }
+			},
+			"422": {
+			  "description": "Validation Error",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/HTTPValidationError"
+				  }
+				}
+			  }
+			},
+			"500": {
+			  "description": "Internal Server Error",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Internal server error occurred"
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  },
+	  "/feedback/session": {
+		"post": {
+		  "tags": [
+			"Feedback"
+		  ],
+		  "summary": "Store Conversation Session Feedback",
+		  "description": "Store user feedback for the overall conversation session.",
+		  "operationId": "store_conversation_session_feedback_feedback_session_post",
+		  "requestBody": {
+			"content": {
+			  "application/json": {
+				"schema": {
+				  "$ref": "#/components/schemas/FeedbackRequest"
+				}
+			  }
+			},
+			"required": true
+		  },
+		  "responses": {
+			"200": {
+			  "description": "Successful Response",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/FeedbackResponse"
+				  }
+				}
+			  }
+			},
+			"404": {
+			  "description": "Session Not Found",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Session not found"
+				  }
+				}
+			  }
+			},
+			"422": {
+			  "description": "Validation Error",
+			  "content": {
+				"application/json": {
+				  "schema": {
+					"$ref": "#/components/schemas/HTTPValidationError"
+				  }
+				}
+			  }
+			},
+			"500": {
+			  "description": "Internal Server Error",
+			  "content": {
+				"application/json": {
+				  "example": {
+					"detail": "Internal server error occurred"
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  }
+	},
+	"components": {
+	  "schemas": {
+		"FeedbackRequest": {
+		  "properties": {
+			"feedback": {
+			  "type": "number",
+			  "maximum": 1.0,
+			  "minimum": -1.0,
+			  "title": "Feedback",
+			  "description": "A unique identifier representing your end-user."
+			},
+			"session_id": {
+			  "type": "string",
+			  "title": "Session Id",
+			  "description": "A unique identifier representing the session associated with the response."
+			}
+		  },
+		  "type": "object",
+		  "required": [
+			"feedback",
+			"session_id"
+		  ],
+		  "title": "FeedbackRequest",
+		  "description": "Definition of the Feedback Request data type."
+		},
+		"FeedbackResponse": {
+		  "properties": {
+			"message": {
+			  "type": "string",
+			  "maxLength": 4096,
+			  "pattern": "[\\s\\S]*",
+			  "title": "Message",
+			  "default": ""
+			}
+		  },
+		  "type": "object",
+		  "title": "FeedbackResponse",
+		  "description": "Definition of the Feedback Request data type."
+		},
+		"HTTPValidationError": {
+		  "properties": {
+			"detail": {
+			  "items": {
+				"$ref": "#/components/schemas/ValidationError"
+			  },
+			  "type": "array",
+			  "title": "Detail"
+			}
+		  },
+		  "type": "object",
+		  "title": "HTTPValidationError"
+		},
+		"HealthResponse": {
+		  "properties": {
+			"message": {
+			  "type": "string",
+			  "maxLength": 4096,
+			  "pattern": "[\\s\\S]*",
+			  "title": "Message",
+			  "default": ""
+			}
+		  },
+		  "type": "object",
+		  "title": "HealthResponse"
+		},
+		"PurchaseInfo": {
+		  "properties": {
+			"customer_id": {
+			  "type": "string",
+			  "title": "Customer Id"
+			},
+			"order_id": {
+			  "type": "string",
+			  "title": "Order Id"
+			},
+			"product_name": {
+			  "type": "string",
+			  "title": "Product Name"
+			},
+			"order_date": {
+			  "type": "string",
+			  "title": "Order Date"
+			},
+			"quantity": {
+			  "anyOf": [
+				{
+				  "type": "integer"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "Quantity"
+			},
+			"order_amount": {
+			  "anyOf": [
+				{
+				  "type": "number"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "Order Amount"
+			},
+			"order_status": {
+			  "anyOf": [
+				{
+				  "type": "string"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "Order Status"
+			},
+			"return_status": {
+			  "anyOf": [
+				{
+				  "type": "string"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "Return Status"
+			},
+			"return_start_date": {
+			  "anyOf": [
+				{
+				  "type": "string"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "Return Start Date"
+			},
+			"return_received_date": {
+			  "anyOf": [
+				{
+				  "type": "string"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "Return Received Date"
+			},
+			"return_completed_date": {
+			  "anyOf": [
+				{
+				  "type": "string"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "Return Completed Date"
+			},
+			"return_reason": {
+			  "anyOf": [
+				{
+				  "type": "string"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "Return Reason"
+			},
+			"notes": {
+			  "anyOf": [
+				{
+				  "type": "string"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "Notes"
+			}
+		  },
+		  "type": "object",
+		  "required": [
+			"customer_id",
+			"order_id",
+			"product_name",
+			"order_date",
+			"quantity",
+			"order_amount",
+			"order_status",
+			"return_status",
+			"return_start_date",
+			"return_received_date",
+			"return_completed_date",
+			"return_reason",
+			"notes"
+		  ],
+		  "title": "PurchaseInfo"
+		},
+		"SessionConversationMessage": {
+		  "properties": {
+			"role": {
+			  "type": "string",
+			  "maxLength": 256,
+			  "pattern": "[\\s\\S]*",
+			  "title": "Role",
+			  "description": "Role for a message AI, User and System",
+			  "default": "user"
+			},
+			"content": {
+			  "type": "string",
+			  "maxLength": 131072,
+			  "pattern": "[\\s\\S]*",
+			  "title": "Content",
+			  "description": "The input query/prompt to the pipeline.",
+			  "default": "I am going to Paris, what should I see?"
+			},
+			"sentiment": {
+			  "type": "string",
+			  "enum": [
+				"positive",
+				"negative",
+				"neutral"
+			  ],
+			  "title": "Sentiment",
+			  "description": "The sentiment of the text, which can be positive, negative, or neutral."
+			}
+		  },
+		  "type": "object",
+		  "required": [
+			"sentiment"
+		  ],
+		  "title": "SessionConversationMessage",
+		  "description": "Definition of the Chat Message type."
+		},
+		"SessionConversationResponse": {
+		  "properties": {
+			"session_info": {
+			  "$ref": "#/components/schemas/SessionInfo"
+			},
+			"messages": {
+			  "items": {
+				"$ref": "#/components/schemas/SessionConversationMessage"
+			  },
+			  "type": "array",
+			  "title": "Messages",
+			  "description": "The list of messages in the conversation"
+			}
+		  },
+		  "type": "object",
+		  "required": [
+			"session_info",
+			"messages"
+		  ],
+		  "title": "SessionConversationResponse"
+		},
+		"SessionInfo": {
+		  "properties": {
+			"session_id": {
+			  "type": "string",
+			  "title": "Session Id",
+			  "description": "The ID of the session"
+			},
+			"start_time": {
+			  "anyOf": [
+				{
+				  "type": "string",
+				  "format": "date-time"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "Start Time",
+			  "description": "The start time of the session"
+			},
+			"end_time": {
+			  "anyOf": [
+				{
+				  "type": "string",
+				  "format": "date-time"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "End Time",
+			  "description": "The end time of the session"
+			}
+		  },
+		  "type": "object",
+		  "required": [
+			"session_id"
+		  ],
+		  "title": "SessionInfo"
+		},
+		"SessionSummaryResponse": {
+		  "properties": {
+			"session_info": {
+			  "$ref": "#/components/schemas/SessionInfo"
+			},
+			"summary": {
+			  "type": "string",
+			  "title": "Summary",
+			  "description": "The generated summary of the session"
+			},
+			"sentiment": {
+			  "type": "string",
+			  "enum": [
+				"positive",
+				"negative",
+				"neutral"
+			  ],
+			  "title": "Sentiment",
+			  "description": "The sentiment of the text, which can be positive, negative, or neutral."
+			}
+		  },
+		  "type": "object",
+		  "required": [
+			"session_info",
+			"summary",
+			"sentiment"
+		  ],
+		  "title": "SessionSummaryResponse"
+		},
+		"SessionsResponse": {
+		  "properties": {
+			"session_id": {
+			  "type": "string",
+			  "title": "Session Id",
+			  "description": "The ID of the session"
+			},
+			"user_id": {
+			  "anyOf": [
+				{
+				  "type": "string"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "User Id",
+			  "description": "The ID of the user"
+			},
+			"start_time": {
+			  "anyOf": [
+				{
+				  "type": "string",
+				  "format": "date-time"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "Start Time",
+			  "description": "The start time of the session"
+			},
+			"end_time": {
+			  "anyOf": [
+				{
+				  "type": "string",
+				  "format": "date-time"
+				},
+				{
+				  "type": "null"
+				}
+			  ],
+			  "title": "End Time",
+			  "description": "The end time of the session"
+			}
+		  },
+		  "type": "object",
+		  "required": [
+			"session_id",
+			"user_id"
+		  ],
+		  "title": "SessionsResponse"
+		},
+		"ValidationError": {
+		  "properties": {
+			"loc": {
+			  "items": {
+				"anyOf": [
+				  {
+					"type": "string"
+				  },
+				  {
+					"type": "integer"
+				  }
+				]
+			  },
+			  "type": "array",
+			  "title": "Location"
+			},
+			"msg": {
+			  "type": "string",
+			  "title": "Message"
+			},
+			"type": {
+			  "type": "string",
+			  "title": "Error Type"
+			}
+		  },
+		  "type": "object",
+		  "required": [
+			"loc",
+			"msg",
+			"type"
+		  ],
+		  "title": "ValidationError"
+		}
+	  }
+	},
+	"tags": [
+	  {
+		"name": "Health",
+		"description": "APIs for checking and monitoring server liveliness and readiness."
+	  },
+	  {
+		"name": "Feedback",
+		"description": "APIs for storing useful information for data flywheel."
+	  },
+	  {
+		"name": "Session",
+		"description": "APIs for fetching useful information for different sessions."
+	  },
+	  {
+		"name": "User Data",
+		"description": "APIs for fetching user specific information."
+	  }
+	]
+  }

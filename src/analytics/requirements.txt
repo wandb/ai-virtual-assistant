@@ -1,0 +1,10 @@
+fastapi==0.115.2
+uvicorn[standard]==0.27.1
+starlette==0.40.0
+langchain-nvidia-ai-endpoints==0.2.2
+langchain==0.2.16
+dataclass-wizard==0.22.3
+redis==5.0.8
+psycopg2-binary==2.9.9
+SQLAlchemy==2.0.31
+bleach==6.1.0
