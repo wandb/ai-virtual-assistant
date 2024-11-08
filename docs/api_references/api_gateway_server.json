@@ -1,0 +1,330 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AI Virtual Assistant for Customer Service",
+    "description": "This API schema describes all the endpoints exposed by the AI Virtual Assistant for Customer Service NIM Blueprint",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/agent/metrics": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Get Metrics",
+        "operationId": "get_metrics_agent_metrics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agent/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Health Check",
+        "description": "Perform a Health Check\n\nReturns 200 when service is up. This does not check the health of downstream services.",
+        "operationId": "health_check_agent_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Internal server error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agent/generate": {
+      "post": {
+        "tags": [
+          "Agent"
+        ],
+        "summary": "Generate Response",
+        "description": "Generate and stream the response to the provided prompt.",
+        "operationId": "generate_response_agent_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Internal server error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AgentRequest": {
+        "properties": {
+          "messages": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "type": "array",
+                "maxItems": 50000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Messages",
+            "description": "A list of messages comprising the conversation so far. The roles of the messages must be alternating between user and assistant. The last input message should have role user. A message with the the system role is optional, and must be the very first message if it is present.",
+            "default": []
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id",
+            "description": "A unique identifier representing your end-user.",
+            "default": ""
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id",
+            "description": "A unique identifier representing the session associated with the response.",
+            "default": ""
+          },
+          "api_type": {
+            "type": "string",
+            "title": "Api Type",
+            "description": "The type of API action: 'create_session', 'end_session', 'generate', or 'summary'."
+          }
+        },
+        "type": "object",
+        "required": [
+          "api_type"
+        ],
+        "title": "AgentRequest",
+        "description": "Definition of the Prompt API data type."
+      },
+      "AgentResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 100000,
+            "pattern": "[\\s\\S]*",
+            "title": "Id",
+            "default": ""
+          },
+          "choices": {
+            "items": {
+              "$ref": "#/components/schemas/AgentResponseChoices"
+            },
+            "type": "array",
+            "maxItems": 256,
+            "title": "Choices",
+            "default": []
+          },
+          "session_id": {
+            "type": "string",
+            "title": "Session Id",
+            "description": "A unique identifier representing the session associated with the response."
+          }
+        },
+        "type": "object",
+        "title": "AgentResponse",
+        "description": "Definition of Chain APIs resopnse data type"
+      },
+      "AgentResponseChoices": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "maximum": 256,
+            "minimum": 0,
+            "format": "int64",
+            "title": "Index",
+            "default": 0
+          },
+          "message": {
+            "$ref": "#/components/schemas/Message",
+            "default": {
+              "role": "assistant",
+              "content": ""
+            }
+          },
+          "finish_reason": {
+            "type": "string",
+            "maxLength": 4096,
+            "pattern": "[\\s\\S]*",
+            "title": "Finish Reason",
+            "default": ""
+          },
+          "sentiment": {
+            "type": "string",
+            "title": "Sentiment",
+            "description": "Any sentiment associated with this message",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "AgentResponseChoices",
+        "description": "Definition of Chain response choices"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 4096,
+            "pattern": "[\\s\\S]*",
+            "title": "Message",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "HealthResponse"
+      },
+      "Message": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "maxLength": 256,
+            "pattern": "[\\s\\S]*",
+            "title": "Role",
+            "description": "Role for a message AI, User and System",
+            "default": "user"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 131072,
+            "pattern": "[\\s\\S]*",
+            "title": "Content",
+            "description": "The input query/prompt to the pipeline.",
+            "default": "I am going to Paris, what should I see?"
+          }
+        },
+        "type": "object",
+        "title": "Message",
+        "description": "Definition of the Chat Message type."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Health",
+      "description": "APIs for checking and monitoring server liveliness and readiness."
+    },
+    {
+      "name": "Agent",
+      "description": "Core APIs for interacting with the agent."
+    }
+  ]
+}

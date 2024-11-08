@@ -1,0 +1,14 @@
+services:
+  ingest-client:
+    container_name: ingest-client
+    image: aiva-customer-service-ingest-client:1.0.0
+    build:
+      context: ../../
+      dockerfile: ./src/ingest_service/Dockerfile
+    command: >
+      /bin/sh -c "python3 import_csv_to_sql.py --host postgres --port 5432 &&
+                  python3 ingest_doc.py --host unstructured-retriever --port 8081"
+
+networks:
+  default:
+    name: nvidia-rag

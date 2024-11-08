@@ -1,0 +1,6 @@
+https://www.nvidia.com/content/geforce-gtx/GeForce_RTX_4090_QSG_Rev1.pdf
+https://www.nvidia.com/content/geforce-gtx/GEFORCE_RTX_4080_SUPER_User_Guide_Rev1.pdf
+https://www.nvidia.com/content/geforce-gtx/GeForce_RTX_4080_QSG_Rev1.pdf
+https://www.nvidia.com/content/geforce-gtx/GEFORCE_RTX_4070_SUPER_User_Guide_Rev1.pdf
+https://www.nvidia.com/content/geforce-gtx/GeForce_RTX_4070_QSG_Rev1.pdf
+https://www.nvidia.com/content/geforce-gtx/GEFORCE_RTX_4060_Ti_User_Guide_Rev1.pdf

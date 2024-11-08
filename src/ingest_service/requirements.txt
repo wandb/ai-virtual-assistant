@@ -1,0 +1,6 @@
+psycopg2-binary==2.9.10
+pandas==2.2.3
+requests==2.31.0
+fastapi==0.115.2
+uvicorn[standard]==0.27.1
+starlette==0.40.0

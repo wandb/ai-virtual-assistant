@@ -1,0 +1,20 @@
+sentiment_prompt: |
+    Analyze the sentiment of the following conversation between a customer service agent and a user. Provide the overall sentiment category.
+    Sentiment Categories:
+    Positive: Indicates satisfaction, gratitude, or successful resolution.
+    Negative: Indicates frustration, complaints, or unresolved issues.
+    Neutral: Indicates factual exchanges without strong emotions.
+    Instructions:
+    - Read the entire conversation carefully.
+    - Determine the overall sentiment category (Positive, Negative, Neutral).
+
+    Please analyze the following conversation and provide your sentiment categorization:
+
+summary_prompt: |
+    Summarize the following conversation between a service rep and a customer in a
+
+    few sentences. Use only the information from the conversation.
+
+query_sentiment_prompt: |
+    You are given the user query or assistant response. Find the sentiment for given query
+    

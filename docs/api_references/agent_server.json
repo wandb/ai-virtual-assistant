@@ -1,0 +1,597 @@
+{
+   "openapi": "3.1.0",
+   "info": {
+     "title": "Agent API's for AI Virtual Assistant for Customer Service",
+     "description": "This API schema describes all the core agentic endpoints exposed by the AI Virtual Assistant for Customer Service NIM Blueprint",
+     "version": "1.0.0"
+   },
+   "paths": {
+     "/health": {
+       "get": {
+         "tags": [
+           "Health"
+         ],
+         "summary": "Health Check",
+         "description": "Perform a Health Check\n\nReturns 200 when service is up. This does not check the health of downstream services.",
+         "operationId": "health_check_health_get",
+         "responses": {
+           "200": {
+             "description": "Successful Response",
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "$ref": "#/components/schemas/HealthResponse"
+                 }
+               }
+             }
+           },
+           "500": {
+             "description": "Internal Server Error",
+             "content": {
+               "application/json": {
+                 "example": {
+                   "detail": "Internal server error occurred"
+                 }
+               }
+             }
+           }
+         }
+       }
+     },
+     "/metrics": {
+       "get": {
+         "tags": [
+           "Health"
+         ],
+         "summary": "Get Metrics",
+         "operationId": "get_metrics_metrics_get",
+         "responses": {
+           "200": {
+             "description": "Successful Response",
+             "content": {
+               "application/json": {
+                 "schema": {}
+               }
+             }
+           }
+         }
+       }
+     },
+     "/create_session": {
+       "get": {
+         "tags": [
+           "Session Management"
+         ],
+         "summary": "Create Session",
+         "operationId": "create_session_create_session_get",
+         "responses": {
+           "200": {
+             "description": "Successful Response",
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "$ref": "#/components/schemas/CreateSessionResponse"
+                 }
+               }
+             }
+           },
+           "500": {
+             "description": "Internal Server Error",
+             "content": {
+               "application/json": {
+                 "example": {
+                   "detail": "Internal server error occurred"
+                 }
+               }
+             }
+           }
+         }
+       }
+     },
+     "/end_session": {
+       "get": {
+         "tags": [
+           "Session Management"
+         ],
+         "summary": "End Session",
+         "operationId": "end_session_end_session_get",
+         "parameters": [
+           {
+             "name": "session_id",
+             "in": "query",
+             "required": true,
+             "schema": {
+               "title": "Session Id"
+             }
+           }
+         ],
+         "responses": {
+           "200": {
+             "description": "Successful Response",
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "$ref": "#/components/schemas/EndSessionResponse"
+                 }
+               }
+             }
+           },
+           "422": {
+             "description": "Validation Error",
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "$ref": "#/components/schemas/HTTPValidationError"
+                 }
+               }
+             }
+           },
+           "500": {
+             "description": "Internal Server Error",
+             "content": {
+               "application/json": {
+                 "example": {
+                   "detail": "Internal server error occurred"
+                 }
+               }
+             }
+           }
+         }
+       }
+     },
+     "/delete_session": {
+       "delete": {
+         "tags": [
+           "Session Management"
+         ],
+         "summary": "Delete Session",
+         "operationId": "delete_session_delete_session_delete",
+         "parameters": [
+           {
+             "name": "session_id",
+             "in": "query",
+             "required": true,
+             "schema": {
+               "title": "Session Id"
+             }
+           }
+         ],
+         "responses": {
+           "200": {
+             "description": "Successful Response",
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "$ref": "#/components/schemas/DeleteSessionResponse"
+                 }
+               }
+             }
+           },
+           "422": {
+             "description": "Validation Error",
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "$ref": "#/components/schemas/HTTPValidationError"
+                 }
+               }
+             }
+           },
+           "500": {
+             "description": "Internal Server Error",
+             "content": {
+               "application/json": {
+                 "example": {
+                   "detail": "Internal server error occurred"
+                 }
+               }
+             }
+           }
+         }
+       }
+     },
+     "/generate": {
+       "post": {
+         "tags": [
+           "Inference"
+         ],
+         "summary": "Generate Answer",
+         "description": "Generate and stream the response to the provided prompt.",
+         "operationId": "generate_answer_generate_post",
+         "requestBody": {
+           "content": {
+             "application/json": {
+               "schema": {
+                 "$ref": "#/components/schemas/Prompt"
+               }
+             }
+           },
+           "required": true
+         },
+         "responses": {
+           "200": {
+             "description": "Successful Response",
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "$ref": "#/components/schemas/ChainResponse"
+                 }
+               }
+             }
+           },
+           "422": {
+             "description": "Validation Error",
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "$ref": "#/components/schemas/HTTPValidationError"
+                 }
+               }
+             }
+           },
+           "500": {
+             "description": "Internal Server Error",
+             "content": {
+               "application/json": {
+                 "example": {
+                   "detail": "Internal server error occurred"
+                 }
+               }
+             }
+           }
+         }
+       }
+     },
+     "/feedback/response": {
+       "post": {
+         "tags": [
+           "Feedback"
+         ],
+         "summary": "Store Last Response Feedback",
+         "description": "Store user feedback for the last response in a conversation session.",
+         "operationId": "store_last_response_feedback_feedback_response_post",
+         "requestBody": {
+           "content": {
+             "application/json": {
+               "schema": {
+                 "$ref": "#/components/schemas/FeedbackRequest"
+               }
+             }
+           },
+           "required": true
+         },
+         "responses": {
+           "200": {
+             "description": "Successful Response",
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "$ref": "#/components/schemas/FeedbackResponse"
+                 }
+               }
+             }
+           },
+           "404": {
+             "description": "Session Not Found",
+             "content": {
+               "application/json": {
+                 "example": {
+                   "detail": "Session not found"
+                 }
+               }
+             }
+           },
+           "422": {
+             "description": "Validation Error",
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "$ref": "#/components/schemas/HTTPValidationError"
+                 }
+               }
+             }
+           },
+           "500": {
+             "description": "Internal Server Error",
+             "content": {
+               "application/json": {
+                 "example": {
+                   "detail": "Internal server error occurred"
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+   },
+   "components": {
+     "schemas": {
+       "ChainResponse": {
+         "properties": {
+           "id": {
+             "type": "string",
+             "maxLength": 100000,
+             "pattern": "[\\s\\S]*",
+             "title": "Id",
+             "default": ""
+           },
+           "choices": {
+             "items": {
+               "$ref": "#/components/schemas/ChainResponseChoices"
+             },
+             "type": "array",
+             "maxItems": 256,
+             "title": "Choices",
+             "default": []
+           },
+           "session_id": {
+             "type": "string",
+             "title": "Session Id",
+             "description": "A unique identifier representing the session associated with the response."
+           }
+         },
+         "type": "object",
+         "title": "ChainResponse",
+         "description": "Definition of Chain APIs resopnse data type"
+       },
+       "ChainResponseChoices": {
+         "properties": {
+           "index": {
+             "type": "integer",
+             "maximum": 256.0,
+             "minimum": 0.0,
+             "format": "int64",
+             "title": "Index",
+             "default": 0
+           },
+           "message": {
+             "$ref": "#/components/schemas/Message",
+             "default": {
+               "role": "assistant",
+               "content": ""
+             }
+           },
+           "finish_reason": {
+             "type": "string",
+             "maxLength": 4096,
+             "pattern": "[\\s\\S]*",
+             "title": "Finish Reason",
+             "default": ""
+           }
+         },
+         "type": "object",
+         "title": "ChainResponseChoices",
+         "description": "Definition of Chain response choices"
+       },
+       "CreateSessionResponse": {
+         "properties": {
+           "session_id": {
+             "type": "string",
+             "maxLength": 4096,
+             "title": "Session Id"
+           }
+         },
+         "type": "object",
+         "required": [
+           "session_id"
+         ],
+         "title": "CreateSessionResponse"
+       },
+       "DeleteSessionResponse": {
+         "properties": {
+           "message": {
+             "type": "string",
+             "maxLength": 4096,
+             "pattern": "[\\s\\S]*",
+             "title": "Message",
+             "default": ""
+           }
+         },
+         "type": "object",
+         "title": "DeleteSessionResponse"
+       },
+       "EndSessionResponse": {
+         "properties": {
+           "message": {
+             "type": "string",
+             "maxLength": 4096,
+             "pattern": "[\\s\\S]*",
+             "title": "Message",
+             "default": ""
+           }
+         },
+         "type": "object",
+         "title": "EndSessionResponse"
+       },
+       "FeedbackRequest": {
+         "properties": {
+           "feedback": {
+             "type": "number",
+             "maximum": 1.0,
+             "minimum": -1.0,
+             "title": "Feedback",
+             "description": "A unique identifier representing your end-user."
+           },
+           "session_id": {
+             "type": "string",
+             "title": "Session Id",
+             "description": "A unique identifier representing the session associated with the response."
+           }
+         },
+         "type": "object",
+         "required": [
+           "feedback",
+           "session_id"
+         ],
+         "title": "FeedbackRequest",
+         "description": "Definition of the Feedback Request data type."
+       },
+       "FeedbackResponse": {
+         "properties": {
+           "message": {
+             "type": "string",
+             "maxLength": 4096,
+             "pattern": "[\\s\\S]*",
+             "title": "Message",
+             "default": ""
+           }
+         },
+         "type": "object",
+         "title": "FeedbackResponse",
+         "description": "Definition of the Feedback Request data type."
+       },
+       "HTTPValidationError": {
+         "properties": {
+           "detail": {
+             "items": {
+               "$ref": "#/components/schemas/ValidationError"
+             },
+             "type": "array",
+             "title": "Detail"
+           }
+         },
+         "type": "object",
+         "title": "HTTPValidationError"
+       },
+       "HealthResponse": {
+         "properties": {
+           "message": {
+             "type": "string",
+             "maxLength": 4096,
+             "pattern": "[\\s\\S]*",
+             "title": "Message",
+             "default": ""
+           }
+         },
+         "type": "object",
+         "title": "HealthResponse"
+       },
+       "Message": {
+         "properties": {
+           "role": {
+             "type": "string",
+             "maxLength": 256,
+             "pattern": "[\\s\\S]*",
+             "title": "Role",
+             "description": "Role for a message AI, User and System",
+             "default": "user"
+           },
+           "content": {
+             "type": "string",
+             "maxLength": 131072,
+             "pattern": "[\\s\\S]*",
+             "title": "Content",
+             "description": "The input query/prompt to the pipeline.",
+             "default": "I am going to Paris, what should I see?"
+           }
+         },
+         "type": "object",
+         "title": "Message",
+         "description": "Definition of the Chat Message type."
+       },
+       "Prompt": {
+         "properties": {
+           "messages": {
+             "items": {
+               "$ref": "#/components/schemas/Message"
+             },
+             "type": "array",
+             "maxItems": 50000,
+             "title": "Messages",
+             "description": "A list of messages comprising the conversation so far. The roles of the messages must be alternating between user and assistant. The last input message should have role user. A message with the the system role is optional, and must be the very first message if it is present."
+           },
+           "max_tokens": {
+             "type": "integer",
+             "maximum": 1024.0,
+             "minimum": 0.0,
+             "format": "int64",
+             "title": "Max Tokens",
+             "description": "The maximum number of tokens to generate in any given call. Note that the model is not aware of this value, and generation will simply stop at the number of tokens specified.",
+             "default": 1024
+           },
+           "stop": {
+             "items": {
+               "type": "string",
+               "maxLength": 256,
+               "pattern": "[\\s\\S]*"
+             },
+             "type": "array",
+             "maxItems": 256,
+             "title": "Stop",
+             "description": "A string or a list of strings where the API will stop generating further tokens. The returned text will not contain the stop sequence.",
+             "default": []
+           },
+           "user_id": {
+             "type": "string",
+             "title": "User Id",
+             "description": "A unique identifier representing your end-user."
+           },
+           "session_id": {
+             "type": "string",
+             "title": "Session Id",
+             "description": "A unique identifier representing the session associated with the response."
+           }
+         },
+         "type": "object",
+         "required": [
+           "messages",
+           "session_id"
+         ],
+         "title": "Prompt",
+         "description": "Definition of the Prompt API data type."
+       },
+       "ValidationError": {
+         "properties": {
+           "loc": {
+             "items": {
+               "anyOf": [
+                 {
+                   "type": "string"
+                 },
+                 {
+                   "type": "integer"
+                 }
+               ]
+             },
+             "type": "array",
+             "title": "Location"
+           },
+           "msg": {
+             "type": "string",
+             "title": "Message"
+           },
+           "type": {
+             "type": "string",
+             "title": "Error Type"
+           }
+         },
+         "type": "object",
+         "required": [
+           "loc",
+           "msg",
+           "type"
+         ],
+         "title": "ValidationError"
+       }
+     }
+   },
+   "tags": [
+     {
+       "name": "Health",
+       "description": "APIs for checking and monitoring server liveliness and readiness."
+     },
+     {
+       "name": "Feedback",
+       "description": "APIs for storing useful information for data flywheel."
+     },
+     {
+       "name": "Session Management",
+       "description": "APIs for managing sessions."
+     },
+     {
+       "name": "Inference",
+       "description": "Core APIs for interacting with the agent."
+     }
+   ]
+ }
