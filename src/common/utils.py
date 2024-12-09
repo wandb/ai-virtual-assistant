@@ -195,15 +195,15 @@ def get_llm(**kwargs) -> LLM | SimpleChatModel:
 @lru_cache
 def get_embedding_model() -> Embeddings:
     """Create the embedding model."""
-    model_kwargs = {"device": "cpu"}
-    if torch.cuda.is_available():
-        model_kwargs["device"] = "cuda:0"
-
-    encode_kwargs = {"normalize_embeddings": False}
     settings = get_config()
 
     logger.info(f"Using {settings.embeddings.model_engine} as model engine and {settings.embeddings.model_name} and model for embeddings")
     if settings.embeddings.model_engine == "huggingface":
+        model_kwargs = {"device": "cpu"}
+        if torch.cuda.is_available():
+            model_kwargs["device"] = "cuda:0"
+
+        encode_kwargs = {"normalize_embeddings": False}
         hf_embeddings = HuggingFaceEmbeddings(
             model_name=settings.embeddings.model_name,
             model_kwargs=model_kwargs,

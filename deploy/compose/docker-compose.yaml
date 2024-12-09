@@ -8,7 +8,7 @@ services:
   # =======================
   agent-chain-server:
     container_name: agent-chain-server
-    image: aiva-customer-service-agent:1.0.0
+    image: nvcr.io/nvidia/blueprints/aiva-customer-service-agent:1.1.0
     build:
       # Set context to repo's root directory
       context: ../../
@@ -35,10 +35,15 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      # Postgres database name for customer data
+      POSTGRES_USER_READONLY: ${POSTGRES_USER:-postgres_readonly}
+      POSTGRES_PASSWORD_READONLY: ${POSTGRES_PASSWORD:-readonly_password}
+      CUSTOMER_DATA_DB: ${CUSTOMER_DATA_DB:-customer_data}
       CANONICAL_RAG_URL: http://unstructured-retriever:8081
       STRUCTURED_RAG_URI: http://structured-retriever:8081
       NVIDIA_API_KEY: ${NVIDIA_API_KEY}
       GRAPH_RECURSION_LIMIT: 20
+      GRAPH_TIMEOUT_IN_SEC: 20
       RETURN_WINDOW_CURRENT_DATE: '2024-10-23' # Leave it empty to get the current date
       RETURN_WINDOW_THRESHOLD_DAYS: 30
       # Log level for server, supported level NOTSET, DEBUG, INFO, WARN, ERROR, CRITICAL
@@ -64,25 +69,35 @@ services:
     build:
       context: ../../
       dockerfile: ./src/api_gateway/Dockerfile
-    image: aiva-customer-service-api-gateway:1.0.0
+    image: nvcr.io/nvidia/blueprints/aiva-customer-service-api-gateway:1.1.0
     command: --port 9000 --host 0.0.0.0 --workers 1
     ports:
       - "9000:9000"
     environment:
       AGENT_SERVER_URL: ${AGENT_SERVER_URL:-http://agent-chain-server:8081}
       ANALYTICS_SERVER_URL: ${ANALYTICS_SERVER_URL:-http://analytics-server:8081}
-      REQUEST_TIMEOUT: 180
+      REQUEST_TIMEOUT: 320
     restart: unless-stopped  # Optional: Automatically restart the container unless it is stopped
     depends_on:
     - agent-chain-server
 
+  agent-frontend:
+    image: nvcr.io/nvidia/blueprints/aiva-customer-service-ui:1.1.0
+    container_name: agent-frontend
+    environment:
+      - INFERENCE_ORIGIN=http://api-gateway-server:9000
+    ports:
+      - "3001:3001"
+    restart: unless-stopped  # Optional: Automatically restart the container unless it is stopped
+    depends_on:
+    - api-gateway-server
 
   # =======================
   # Analytics Services - summary/sentiment and similar APIs are exposed as part of analytics MS
   # =======================
   analytics-server:
     container_name: analytics-server
-    image: aiva-customer-service-analytics:1.0.0
+    image: nvcr.io/nvidia/blueprints/aiva-customer-service-analytics:1.1.0
     build:
       # Set context to repo's root directory
       context: ../../
@@ -114,7 +129,8 @@ services:
     - "8081"
     shm_size: 5gb
     depends_on:
-    - postgres
+      postgres:
+        condition: service_healthy
 
 
   # =======================
@@ -123,7 +139,7 @@ services:
   # Fetch relevant document from vectorstore
   unstructured-retriever:
     container_name: unstructured-retriever
-    image: aiva-customer-service-unstructured-retriever:1.0.0
+    image: nvcr.io/nvidia/blueprints/aiva-customer-service-unstructured-retriever:1.1.0
     build:
       # Set context to repo's root directory
       context: ../../
@@ -182,7 +198,7 @@ services:
   # Fetch user information form database
   structured-retriever:
     container_name: structured-retriever
-    image: aiva-customer-service-structured-retriever:1.0.0
+    image: nvcr.io/nvidia/blueprints/aiva-customer-service-structured-retriever:1.1.0
     build:
       context: ../../
       dockerfile: src/retrievers/Dockerfile
@@ -194,16 +210,20 @@ services:
       APP_LLM_MODELNAME: ${APP_LLM_MODELNAME:-meta/llama-3.1-70b-instruct}
       APP_LLM_MODELENGINE: nvidia-ai-endpoints
       APP_LLM_SERVERURL: ${APP_LLM_SERVERURL:-""}
-      APP_LLM_MODELNAMEPANDASAI: ${APP_LLM_MODELNAME:-meta/llama-3.1-70b-instruct}
+      APP_EMBEDDINGS_MODELNAME: ${APP_EMBEDDINGS_MODELNAME:-nvidia/nv-embedqa-e5-v5}
+      APP_EMBEDDINGS_MODELENGINE: ${APP_EMBEDDINGS_MODELENGINE:-nvidia-ai-endpoints}
+      APP_EMBEDDINGS_SERVERURL: ${APP_EMBEDDINGS_SERVERURL:-""}
       APP_PROMPTS_CHATTEMPLATE: "You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Please ensure that your responses are positive in nature."
       APP_PROMPTS_RAGTEMPLATE: "You are a helpful AI assistant named Envie. You will reply to questions only based on the context that you are provided. If something is out of context, you will refrain from replying and politely decline to respond to the user."
       NVIDIA_API_KEY: ${NVIDIA_API_KEY}
       COLLECTION_NAME: ${COLLECTION_NAME:-structured_data}
+      APP_VECTORSTORE_URL: "http://milvus:19530"
+      APP_VECTORSTORE_NAME: "milvus"
       # Database name to store user purchase history, only postgres is supported
       APP_DATABASE_NAME: ${APP_DATABASE_NAME:-"postgres"}
       APP_DATABASE_URL: ${APP_DATABASE_URL:-"postgres:5432"}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres_readonly}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-readonly_password}
       POSTGRES_DB: ${POSTGRES_DB:-customer_data}
       CSV_NAME: PdM_machines
       LOGLEVEL: ${LOGLEVEL:-INFO}
@@ -214,16 +234,20 @@ services:
     shm_size: 5gb
     depends_on:
       postgres:
+            condition: service_healthy
+            required: false
+      milvus:
+        condition: service_healthy
+      nemollm-embedding:
         condition: service_healthy
         required: false
-
 
   # =======================
   # Database Services - User purchase history and permanently store conversation details
   # =======================
   postgres:
     container_name: postgres_container
-    image: postgres:17.0
+    image: postgres:17.1
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
@@ -235,6 +259,7 @@ services:
       - "-c"
       - "max_connections=200"
     volumes:
+       - ./init-scripts:/docker-entrypoint-initdb.d  # Mount initialization scripts
        - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
@@ -248,7 +273,7 @@ services:
   # For visualization purpose
   pgadmin:
     container_name: pgadmin_container
-    image: dpage/pgadmin4:8.12.0
+    image: dpage/pgadmin4:8.13.0
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
@@ -287,7 +312,7 @@ services:
   # =======================
   etcd:
     container_name: milvus-etcd
-    image: quay.io/coreos/etcd:v3.5.5
+    image: quay.io/coreos/etcd:v3.5.17
     environment:
       - ETCD_AUTO_COMPACTION_MODE=revision
       - ETCD_AUTO_COMPACTION_RETENTION=1000
@@ -304,7 +329,7 @@ services:
 
   minio:
     container_name: milvus-minio
-    image: minio/minio:RELEASE.2024-05-01T01-11-10Z
+    image: minio/minio:RELEASE.2024-11-07T00-52-20Z
     environment:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
@@ -322,7 +347,7 @@ services:
 
   milvus:
     container_name: milvus-standalone
-    image: milvusdb/milvus:v2.4.4-gpu
+    image: milvusdb/milvus:v2.4.15-gpu
     command: ["milvus", "run", "standalone"]
     environment:
       ETCD_ENDPOINTS: etcd:2379
@@ -333,9 +358,17 @@ services:
     ports:
       - "19530:19530"
       - "9091:9091"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      start_period: 90s
+      timeout: 20s
+      retries: 3
     depends_on:
-      - "etcd"
-      - "minio"
+      etcd:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     deploy:
       resources:
         reservations:

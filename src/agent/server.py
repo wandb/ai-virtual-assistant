@@ -423,7 +423,9 @@ async def generate_answer(request: Request,
                             input_for_graph = None
                 try:
                     function_start_time = time.time()
-
+                    # Set Maximum time to wait for a step to complete, in seconds. Defaults to None
+                    graph_timeout_env =  os.environ.get('GRAPH_TIMEOUT_IN_SEC', None)
+                    app.agent.graph.step_timeout = int(graph_timeout_env) if graph_timeout_env else None
                     async for event in app.agent.graph.astream_events(input_for_graph, version="v2", config=config, debug=debug_langgraph):
                         kind = event["event"]
                         tags = event.get("tags", [])
@@ -488,7 +490,10 @@ async def generate_answer(request: Request,
                         logger.debug(response_choice)
                         yield "data: " + str(chain_response.json()) + "\n\n"
                     # Check for the interrupt
-
+                except asyncio.TimeoutError as te:
+                    logger.info("This issue may occur if the LLM takes longer to respond. The timeout duration can be configured using the environment variable GRAPH_TIMEOUT_IN_SEC.")
+                    logger.error(f"Graph Timeout Error. Error details: {te}")
+                    is_exception = True
                 except GraphRecursionError as ge:
                     logger.error(f"Graph Recursion Error. Error details: {ge}")
                     is_exception = True

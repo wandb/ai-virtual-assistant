@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "AI Virtual Assistant for Customer Service",
+    "title": "API Gateway server for AI Virtual Assistant for Customer Service",
     "description": "This API schema describes all the endpoints exposed by the AI Virtual Assistant for Customer Service NIM Blueprint",
     "version": "1.0.0"
   },
@@ -128,7 +128,7 @@
               }
             ],
             "title": "Messages",
-            "description": "A list of messages comprising the conversation so far. The roles of the messages must be alternating between user and assistant. The last input message should have role user. A message with the the system role is optional, and must be the very first message if it is present.",
+            "description": "A list of messages comprising the conversation so far. The roles of the messages must be alternating between user and assistant. The last input message should have role user. A message with the the system role is optional, and must be the very first message if it is present. Relevant only for api_type create_session and generate.",
             "default": []
           },
           "user_id": {
@@ -160,13 +160,17 @@
           "api_type": {
             "type": "string",
             "title": "Api Type",
-            "description": "The type of API action: 'create_session', 'end_session', 'generate', or 'summary'."
+            "description": "The type of API action: 'create_session', 'end_session' or 'generate'.",
+            "default": "create_session"
+          },
+          "generate_summary": {
+            "type": "boolean",
+            "title": "Generate Summary",
+            "description": "Enable summary generation when api_type: end_session is invoked.",
+            "default": false
           }
         },
         "type": "object",
-        "required": [
-          "api_type"
-        ],
         "title": "AgentRequest",
         "description": "Definition of the Prompt API data type."
       },
@@ -192,6 +196,12 @@
             "type": "string",
             "title": "Session Id",
             "description": "A unique identifier representing the session associated with the response."
+          },
+          "sentiment": {
+            "type": "string",
+            "title": "Sentiment",
+            "description": "Any sentiment associated with this message",
+            "default": ""
           }
         },
         "type": "object",
@@ -211,8 +221,8 @@
           "message": {
             "$ref": "#/components/schemas/Message",
             "default": {
-              "role": "assistant",
-              "content": ""
+              "role": "user",
+              "content": "Hello what can you do?"
             }
           },
           "finish_reason": {
@@ -220,12 +230,6 @@
             "maxLength": 4096,
             "pattern": "[\\s\\S]*",
             "title": "Finish Reason",
-            "default": ""
-          },
-          "sentiment": {
-            "type": "string",
-            "title": "Sentiment",
-            "description": "Any sentiment associated with this message",
             "default": ""
           }
         },
@@ -275,7 +279,7 @@
             "pattern": "[\\s\\S]*",
             "title": "Content",
             "description": "The input query/prompt to the pipeline.",
-            "default": "I am going to Paris, what should I see?"
+            "default": "Hello what can you do?"
           }
         },
         "type": "object",

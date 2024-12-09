@@ -106,10 +106,11 @@ class Message(BaseModel):
 
 class AgentRequest(BaseModel):
     """Definition of the Prompt API data type."""
-    messages: Optional[List[Message]] = Field([], description="A list of messages comprising the conversation so far. The roles of the messages must be alternating between user and assistant. The last input message should have role user. A message with the the system role is optional, and must be the very first message if it is present.", max_items=50000)
+    messages: Optional[List[Message]] = Field([], description="A list of messages comprising the conversation so far. The roles of the messages must be alternating between user and assistant. The last input message should have role user. A message with the the system role is optional, and must be the very first message if it is present. Relevant only for api_type create_session and generate.", max_items=50000)
     user_id: Optional[str] = Field("", description="A unique identifier representing your end-user.")
     session_id: Optional[str] = Field("", description="A unique identifier representing the session associated with the response.")
-    api_type: str = Field(description="The type of API action: 'create_session', 'end_session', 'generate', or 'summary'.", default="create_session")
+    api_type: str = Field(description="The type of API action: 'create_session', 'end_session' or 'generate'.", default="create_session")
+    generate_summary: bool = Field(description="Enable summary generation when api_type: end_session is invoked.", default=False)
 
 class AgentResponseChoices(BaseModel):
     """ Definition of Chain response choices"""
@@ -191,6 +192,7 @@ async def generate_response(request: Request, prompt: AgentRequest) -> Streaming
     """Generate and stream the response to the provided prompt."""
 
     api_type = prompt.api_type
+    logger.info(f"\n======API Gateway called with input: {prompt.dict()}=======\n")
 
     def get_agent_generate_response() -> StreamingResponse:
         target_api_url = f"{AGENT_SERVER_URL}/generate"
@@ -235,41 +237,51 @@ async def generate_response(request: Request, prompt: AgentRequest) -> Streaming
         yield "data: " + str(chain_response.json()) + "\n\n"
 
     try:
-
         if api_type == "create_session":
+            logger.info("Calling /create_session API of agent MS")
             target_api_url = f"{AGENT_SERVER_URL}/create_session"
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(REQUEST_TIMEOUT)) as client:
                 processed_response = await fetch_and_process_response(client, "GET", target_api_url)
             logger.info(f"Response from /create_session: {processed_response}")
+
             prompt.session_id = processed_response.get("session_id")
+            logger.info(f"Calling /generate API of agent MS with session id: {prompt.session_id}")
             return get_agent_generate_response()
 
         elif api_type == "end_session":
-            target_api_url = f"{AGENT_SERVER_URL}/delete_session"
-            params = {"session_id": prompt.session_id}
-            async with httpx.AsyncClient() as client:
-                processed_response = await fetch_and_process_response(client, "DELETE", target_api_url, params=params)
-                logger.info(f"Response from /delete_session: {processed_response}")
-            return StreamingResponse(response_generator(processed_response.get("message", "")), media_type="text/event-stream")
-
-        elif api_type == "generate":
-            return get_agent_generate_response()
-
-        elif api_type == "summary":
+            logger.info(f"Calling /end_session API of agent MS with session id: {prompt.session_id}.")
             target_api_url = f"{AGENT_SERVER_URL}/end_session"
             params = {"session_id": prompt.session_id}
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(REQUEST_TIMEOUT)) as client:
                 processed_response = await fetch_and_process_response(client, "GET", target_api_url, params=params)
                 logger.info(f"Response from /end_session: {processed_response}")
 
-            target_api_url = f"{ANALYTICS_SERVER_URL}/session/summary"
-            async with httpx.AsyncClient() as client:
-                processed_response = await fetch_and_process_response(client, "GET", target_api_url, params=params)
-                logger.info(f"Response from /session/summary: {processed_response}")
-            return StreamingResponse(response_generator(processed_response.get("summary", ""), sentiment=processed_response.get("sentiment", "")), media_type="text/event-stream")
+            # If summary is enabled, call the summary endpoint
+            if prompt.generate_summary:
+                logger.info(f"Calling /session/summary endpoint of analytics MS with session {prompt.session_id}")
+                target_api_url = f"{ANALYTICS_SERVER_URL}/session/summary"
+                async with httpx.AsyncClient(timeout=httpx.Timeout(REQUEST_TIMEOUT)) as client:
+                    generated_summary = await fetch_and_process_response(client, "GET", target_api_url, params=params)
+                    logger.info(f"Response from /session/summary: {generated_summary}")
+
+            logger.info(f"Calling /delete_session API of agent MS with session id: {prompt.session_id}.")
+            target_api_url = f"{AGENT_SERVER_URL}/delete_session"
+            params = {"session_id": prompt.session_id}
+            async with httpx.AsyncClient(timeout=httpx.Timeout(REQUEST_TIMEOUT)) as client:
+                processed_response = await fetch_and_process_response(client, "DELETE", target_api_url, params=params)
+                logger.info(f"Response from /delete_session: {processed_response}")
+
+            if prompt.generate_summary:
+                return StreamingResponse(response_generator(generated_summary.get("summary", ""), sentiment=generated_summary.get("sentiment", "")), media_type="text/event-stream")
+            else:
+                return StreamingResponse(response_generator(processed_response.get("message", "")), media_type="text/event-stream")
+
+        elif api_type == "generate":
+            logger.info(f"Calling /generate endpoint of agent MS with session id: {prompt.session_id}")
+            return get_agent_generate_response()
 
         else:
-            raise ValueError("Wrong API type provided. 'create_session', 'end_session', 'generate', or 'summary'")
+            raise ValueError("Wrong api_type provided as part of the request. 'create_session', 'end_session', or 'generate'")
 
     except httpx.ReadTimeout as e:
         logger.error(f"HTTP Read Timeout: {e}")
@@ -279,8 +291,8 @@ async def generate_response(request: Request, prompt: AgentRequest) -> Streaming
         logger.error(f"Request Error: {e}")
         raise HTTPException(status_code=502, detail="Error communicating with the upstream server.")
     except asyncio.CancelledError as e:
-        logger.error("Response generation was cancelled. Details: {e}")
+        logger.error(f"Response generation was cancelled. Details: {e}")
         raise HTTPException(status_code=500, detail=f"Server interruption before response completion: {e}")
     except Exception as e:
-        logger.error("Internal server error. Details: {e}")
+        logger.error(f"Internal server error. Details: {e}")
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {e}")

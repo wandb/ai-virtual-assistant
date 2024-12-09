@@ -80,8 +80,8 @@ def get_purchase_history(user_id: str) -> str:
 
     db_params = {
         'dbname': os.getenv("CUSTOMER_DATA_DB",'customer_data'),
-        'user': os.getenv('POSTGRES_USER', None),
-        'password': os.getenv('POSTGRES_PASSWORD', None),
+        'user': os.getenv('POSTGRES_USER_READONLY', None),
+        'password': os.getenv('POSTGRES_PASSWORD_READONLY', None),
         'host': host,
         'port': port
     }

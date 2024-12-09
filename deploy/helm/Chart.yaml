@@ -1,0 +1,46 @@
+
+# Copyright (c) 2023, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+
+apiVersion: v2
+name: blueprint-aiva
+description: AI-VirtualAssistant RAG on NIMs
+type: application
+version: 1.1.0
+appVersion: ''
+dependencies:
+- name: agent-services
+  version: 0.0.1
+- name: analytics-services
+  version: 0.0.1
+- name: cache-services
+  version: 0.0.1
+- name: etcd
+  version: 0.0.1
+- name: milvus
+  version: 0.0.1
+- name: minio
+  version: 0.0.1
+- name: pgadmin
+  version: 0.0.1
+- name: postgres
+  version: 0.0.1
+- name: retriever-canonical
+  version: 0.0.1
+- name: retriever-structured
+  version: 0.0.1
+- name: nemollm-inference
+  version: 0.0.1
+- name: nemollm-embedding
+  version: 0.0.1
+- name: ranking-ms
+  version: 0.0.1
+- name: api-gateway
+  version: 0.0.1
+- name: ingest-client
+  version: 0.0.1
