@@ -49,11 +49,9 @@ limitations under the License.
 - [Helm chart deployment](#helm-chart-deployment)
     - [Minimum hardware requirements](#minimum-hardware-requirements)
     - [Prerequisites](#prerequisites-1)
-    - [Obtain API keys](#obtain-api-keys-1)
     - [Initialize environment variables](#initialize-environment-variables)
     - [Helm deployment](#helm-deployment)
     - [Interacting with UI service](#interacting-with-ui-service)
-    - [For reference](#for-reference)
 - [Troubleshooting](#troubleshooting)
   - [Container build issues](#container-build-issues)
     - [Device error](#device-error)
@@ -320,7 +318,7 @@ f2ce39cf3027   compose-redis-commander-1   Up 3 hours (healthy)
  docker compose -f deploy/compose/docker-compose.yaml --profile local-nim up -d
 
 ```
-On successfully deployment, you should see these containers running
+On successful deployment, you should see these containers running. It may take approximately 10 minutes to download and deploy the models for the first time.
 ```bash
 docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Status}}"
 CONTAINER ID   NAMES                                   STATUS
@@ -511,6 +509,7 @@ postgres-postgres-deployment-96944cc48-96rz5                  1/1     Running   
 ranking-ms-ranking-deployment-5c7768d88b-zvtt5                1/1     Running   0          15m
 retriever-canonical-canonical-deployment-9754b58fb-p6rbd      1/1     Running   0          15m
 retriever-structured-structured-deployment-6d744d6957-dh7sj   1/1     Running   0          15m
+aiva-aiva-ui-ff74b47d7-r27pb                                  1/1     Running   0          15m
 ```
 
 #### Interacting with UI service
