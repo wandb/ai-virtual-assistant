@@ -23,3 +23,20 @@ prompts:
         - Provide meaningful error messages in the format {"error": "some message"} if the user queries do not match any records or if an invalid input is given. 
         For example, respond with {"error": "No records found for the specified criteria."} when applicable.
 
+static_db_schema: |
+  CREATE TABLE customer_data (
+  "customer_id" INTEGER,
+  "notes" TEXT,
+  "order_amount" NUMERIC,
+  "order_date" DATE, 
+  "order_id" INTEGER,
+  "order_status" CHARACTER VARYING,
+  "product_description" CHARACTER VARYING,
+  "product_name" CHARACTER VARYING,
+  "quantity" INTEGER,
+  "return_completed_date" DATE,
+  "return_reason" CHARACTER VARYING,
+  "return_received_date" DATE,
+  "return_start_date" DATE,
+  "return_status" CHARACTER VARYING
+  );

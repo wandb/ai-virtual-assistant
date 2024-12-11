@@ -1,11 +1,11 @@
 fastapi==0.115.2
 uvicorn[standard]==0.27.1
 starlette==0.40.0
-langchain-nvidia-ai-endpoints==0.2.2
+langchain-nvidia-ai-endpoints==0.3.5
 dataclass-wizard==0.22.3
 nltk==3.9.1
 unstructured[all-docs]==0.12.5
-python-multipart==0.0.9
-langchain-community==0.2.17
+python-multipart==0.0.18
+langchain-community==0.3.0
 pymilvus==2.4.0
 sentence-transformers==3.0.0

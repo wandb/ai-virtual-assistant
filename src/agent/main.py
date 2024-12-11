@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+import os
 from typing import Annotated, TypedDict, Dict
 from langgraph.graph.message import AnyMessage, add_messages
 from typing import Callable
@@ -378,7 +379,7 @@ builder.add_conditional_edges("return_processing", route_return_processing)
 
 
 def user_info(state: State):
-    return {"user_purchase_history": get_purchase_history(state["user_id"])}
+    return {"user_purchase_history": get_purchase_history(state["user_id"]), "current_product": ""}
 
 builder.add_node("fetch_purchase_history", user_info)
 builder.add_edge(START, "fetch_purchase_history")
@@ -487,7 +488,6 @@ graph = builder.compile(checkpointer=memory,
                         interrupt_before=["return_processing_sensitive_tools"],
                         #interrupt_after=["ask_human"]
                         )
-
 
 try:
     # Generate the PNG image from the graph

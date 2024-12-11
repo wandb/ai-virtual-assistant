@@ -1,7 +1,7 @@
 services:
   ingest-client:
     container_name: ingest-client
-    image: aiva-customer-service-ingest-client:1.0.0
+    image: nvcr.io/nvidia/blueprints/aiva-customer-service-ingest-client:1.1.0
     build:
       context: ../../
       dockerfile: ./src/ingest_service/Dockerfile

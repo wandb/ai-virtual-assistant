@@ -190,7 +190,6 @@ class PostgresClient:
                 end_time=session_info.get("end_time"),
                 sentiment=session_info.get("sentiment"),
                 summary=session_info.get("summary"),
-                conversation_data=json.dumps(session_info.get("messages"))
             )
             session.merge(summary)
             session.commit()
