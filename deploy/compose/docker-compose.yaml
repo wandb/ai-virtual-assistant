@@ -8,7 +8,7 @@ services:
   # =======================
   agent-chain-server:
     container_name: agent-chain-server
-    image: nvcr.io/nvidia/blueprints/aiva-customer-service-agent:1.1.0
+    image: nvcr.io/nvidia/blueprint/aiva-customer-service-agent:1.1.0
     build:
       # Set context to repo's root directory
       context: ../../
@@ -69,7 +69,7 @@ services:
     build:
       context: ../../
       dockerfile: ./src/api_gateway/Dockerfile
-    image: nvcr.io/nvidia/blueprints/aiva-customer-service-api-gateway:1.1.0
+    image: nvcr.io/nvidia/blueprint/aiva-customer-service-api-gateway:1.1.0
     command: --port 9000 --host 0.0.0.0 --workers 1
     ports:
       - "9000:9000"
@@ -82,7 +82,7 @@ services:
     - agent-chain-server
 
   agent-frontend:
-    image: nvcr.io/nvidia/blueprints/aiva-customer-service-ui:1.1.0
+    image: nvcr.io/nvidia/blueprint/aiva-customer-service-ui:1.1.0
     container_name: agent-frontend
     environment:
       - INFERENCE_ORIGIN=http://api-gateway-server:9000
@@ -97,7 +97,7 @@ services:
   # =======================
   analytics-server:
     container_name: analytics-server
-    image: nvcr.io/nvidia/blueprints/aiva-customer-service-analytics:1.1.0
+    image: nvcr.io/nvidia/blueprint/aiva-customer-service-analytics:1.1.0
     build:
       # Set context to repo's root directory
       context: ../../
@@ -139,7 +139,7 @@ services:
   # Fetch relevant document from vectorstore
   unstructured-retriever:
     container_name: unstructured-retriever
-    image: nvcr.io/nvidia/blueprints/aiva-customer-service-unstructured-retriever:1.1.0
+    image: nvcr.io/nvidia/blueprint/aiva-customer-service-unstructured-retriever:1.1.0
     build:
       # Set context to repo's root directory
       context: ../../
@@ -198,7 +198,7 @@ services:
   # Fetch user information form database
   structured-retriever:
     container_name: structured-retriever
-    image: nvcr.io/nvidia/blueprints/aiva-customer-service-structured-retriever:1.1.0
+    image: nvcr.io/nvidia/blueprint/aiva-customer-service-structured-retriever:1.1.0
     build:
       context: ../../
       dockerfile: src/retrievers/Dockerfile
