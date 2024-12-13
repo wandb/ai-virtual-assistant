@@ -34,8 +34,8 @@ from pydantic import BaseModel, Field, constr
 logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO').upper())
 logger = logging.getLogger(__name__)
 
-if "WANDB_API_KEY" in os.environ:
-    if "WANDB_PROJECT" in os.environ:
+if "WANDB_API_KEY" in os.environ and os.environ["WANDB_API_KEY"] != "":
+    if "WANDB_PROJECT" in os.environ and os.environ["WANDB_PROJECT"] != "":
         client = weave.init(os.environ.get("WANDB_PROJECT"))
     else:
         logger.warning("No WANDB_PROJECT env var set, using default W&B project: nv-ai-virtual-assistant")
