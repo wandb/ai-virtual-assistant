@@ -35,7 +35,8 @@ The integration is activated when setting `WANDB_API_KEY` when deploying the blu
 
 NOTE: 
 - By default, tracing is logged to your default team in W&B, under project `nv-ai-virtual-assistant`. You can override this by setting `WANDB_PROJECT` as well.
-- Milvus is running in CPU mode here for ease of stand-up locally
+- Milvus is running in CPU mode in the docker compose for ease of stand-up locally
+- Ensure to set `WANDB_API_KEY` and `WANDB_PROJECT` in the values.yaml file for the helm deployment.
 
 This repository has been left largely intact from the source. The documentation below is the original.
 
