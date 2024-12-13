@@ -15,7 +15,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<h1><img align="center" src="https://github.com/user-attachments/assets/cbe0d62f-c856-4e0b-b3ee-6184b7c4d96f">NVIDIA AI Blueprint: AI Virtual Assistant for Customer Service</h1>
+<h1><img align="center" src="https://github.com/user-attachments/assets/cbe0d62f-c856-4e0b-b3ee-6184b7c4d96f">NVIDIA AI Blueprint: AI Virtual Assistant for Customer Service with Weights & Biases Weave</h1>
+
+## W&B Integration of the AI Virtual Assistant
+
+<p align="center">
+<img src="./docs/imgs/weave-evals.png" width="750">
+</p>
+
+Weights & Biases has augmented the AI Virtual Assistant Blueprint to give you instant tracing and visibility into the agent,
+as well as a platform to iterate on it to bring it to production. The following services have been enabled with W&B Weave:
+
+- Agent
+- Unstructured Retriever
+- Structured Retriever
+
+This should provide you with the data to be successful in your implementation of this Agent blueprint all the way to production.
+The integration is activated when setting `WANDB_API_KEY` when deploying the blueprint in the docker compose or the helm charts (modifying the values file).
+
+NOTE: By default, tracing is logged to your default team in W&B, under project `nv-ai-virtual-assistant`. 
+You can override this by setting `WANDB_PROJECT` as well.
+
+This repository has been largely intact from the source. The documentation below is the original.
 
 ## Table of Contents
 - [Table of Contents](#table-of-contents)

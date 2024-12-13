@@ -23,11 +23,13 @@ import os
 import redis
 import json
 import time
+import weave
 
 from src.common.utils import get_config
 
 DEFAULT_DB = "0"
 class RedisClient:
+    @weave.op()
     def __init__(self) -> None:
 
 
@@ -44,13 +46,14 @@ class RedisClient:
         print(f"Host: {host}, Port: {port}, DB: {DEFAULT_DB}")
         self.redis_client = redis.Redis(host=host, port=port, db=DEFAULT_DB, decode_responses=True)
 
-
+    @weave.op()
     def get_conversation(self, session_id: str) -> List:
         """Retrieve the entire conversation history from Redis as a list"""
 
         conversation_hist = self.redis_client.lrange(f"{session_id}:conversation_hist", 0, -1)
         return [json.loads(conv) for conv in conversation_hist]
 
+    @weave.op()
     def get_k_conversation(self, session_id: str, k_turn: Optional[int] = None) -> List:
         """Retrieve the last k conversations from Redis"""
 
@@ -60,6 +63,7 @@ class RedisClient:
         conversation_hist = self.redis_client.lrange(f"{session_id}:conversation_hist", -k_turn, -1)
         return [json.loads(conv) for conv in conversation_hist]
 
+    @weave.op()
     def save_conversation(self, session_id: str, user_id: Optional[str], conversation: List) -> bool:
         try:
             # Store each conversation entry as a JSON string in a Redis list
@@ -88,12 +92,12 @@ class RedisClient:
             print(f"Failed to ingest document due to exception {e}")
             return False
 
-
+    @weave.op()
     def is_session(self, session_id: str) -> bool:
         """Check if session_id already exist in cache"""
         return self.redis_client.exists(f"{session_id}:start_conversation_time")
 
-
+    @weave.op()
     def get_session_info(self, session_id: str) -> Dict:
         """Retrieve complete session information from cache"""
 
@@ -106,7 +110,7 @@ class RedisClient:
 
         return resp
 
-
+    @weave.op()
     def response_feedback(self, session_id: str, response_feedback: float) -> bool:
         try:
             # Get the key for the conversation history
@@ -146,7 +150,7 @@ class RedisClient:
             print(f"Unexpected error while storing user feedback: {str(e)}")
             return False
 
-
+    @weave.op()
     def delete_conversation(self, session_id: str) -> bool:
         """Delete conversation for the given session id"""
         try:
@@ -178,7 +182,7 @@ class RedisClient:
             print(f"Unexpected error while deleting conversation: {str(e)}")
             return False
 
-
+    @weave.op()
     def create_session(self, session_id: str, user_id: str = ""):
         """Create a entry for given session id"""
         try:

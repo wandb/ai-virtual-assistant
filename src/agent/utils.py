@@ -15,6 +15,7 @@
 import re
 import os
 import logging
+import weave
 from typing import Dict
 from pydantic import BaseModel, Field
 from urllib.parse import urlparse
@@ -43,6 +44,7 @@ default_llm_kwargs = {"temperature": 0, "top_p": 0.7, "max_tokens": 1024}
 canonical_rag_url = os.getenv('CANONICAL_RAG_URL', 'http://unstructured-retriever:8081')
 canonical_rag_search = f"{canonical_rag_url}/search"
 
+@weave.op()
 def get_product_name(messages, product_list) -> Dict:
     """Given the user message and list of product find list of items which user might be talking about"""
 
@@ -123,7 +125,7 @@ def get_product_name(messages, product_list) -> Dict:
         "products_from_purchase": list(set([product for product in matching_products]))
     }
 
-
+@weave.op()
 def handle_tool_error(state) -> dict:
     error = state.get("error")
     tool_calls = state["messages"][-1].tool_calls
@@ -137,13 +139,13 @@ def handle_tool_error(state) -> dict:
         ]
     }
 
-
+@weave.op()
 def create_tool_node_with_fallback(tools: list) -> dict:
     return ToolNode(tools).with_fallbacks(
         [RunnableLambda(handle_tool_error)], exception_key="error"
     )
 
-
+@weave.op()
 async def get_checkpointer() -> tuple:
     settings = get_config()
 
@@ -174,7 +176,7 @@ async def get_checkpointer() -> tuple:
     else:
         raise ValueError(f"Only inmemory and postgres is supported chckpointer type")
 
-
+@weave.op()
 def remove_state_from_checkpointer(session_id):
 
     settings = get_config()
@@ -230,6 +232,7 @@ def remove_state_from_checkpointer(session_id):
         # For other supported checkpointer(i.e. inmemory) we don't need cleanup
         pass
 
+@weave.op()
 def canonical_rag(query: str, conv_history: list)  -> str:
     """Use this for answering generic queries about products, specifications, warranties, usage, and issues."""
 

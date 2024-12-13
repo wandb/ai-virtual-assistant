@@ -58,6 +58,10 @@ agent-services:
             value: http://retriever-structured-structured-deployment-structured-service:8087
           - name: NVIDIA_API_KEY
             value: ""
+          - name: WANDB_API_KEY
+            value: ""
+          - name: WANDB_PROJECT
+            value: ""
           - name: GRAPH_RECURSION_LIMIT
             value: '20'
           - name: GRAPH_TIMEOUT_IN_SEC
@@ -180,6 +184,10 @@ retriever-canonical:
             value: '200'
           - name: NVIDIA_API_KEY
             value: ""
+          - name: WANDB_API_KEY
+            value: ""
+          - name: WANDB_PROJECT
+            value: ""
           - name: COLLECTION_NAME
             value: unstructured_data
           - name: APP_RETRIEVER_TOPK
@@ -235,6 +243,10 @@ retriever-structured:
               of context, you will refrain from replying and politely decline to respond
               to the user.
           - name: NVIDIA_API_KEY
+            value: ""
+          - name: WANDB_API_KEY
+            value: ""
+          - name: WANDB_PROJECT
             value: ""
           - name: COLLECTION_NAME
             value: structured_data

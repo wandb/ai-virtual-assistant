@@ -14,6 +14,7 @@
 # limitations under the License.
 import logging
 import os
+import weave
 from typing import Annotated, TypedDict, Dict
 from langgraph.graph.message import AnyMessage, add_messages
 from typing import Callable
@@ -50,6 +51,7 @@ class State(TypedDict):
     reason: str
 
 # NODES FOR THE AGENT
+@weave.op()
 def validate_product_info(state: State, config: RunnableConfig):
     # This node will take user history and find product name based on query
     # If there are multiple name of no name specified in the graph then it will
@@ -83,6 +85,7 @@ def validate_product_info(state: State, config: RunnableConfig):
 
     return response_dict
 
+@weave.op()
 async def handle_other_talk(state: State, config: RunnableConfig):
     """Handles greetings and queries outside order status, returns, or products, providing polite redirection and explaining chatbot limitations."""
 
@@ -106,7 +109,7 @@ async def handle_other_talk(state: State, config: RunnableConfig):
 
     return {"messages": [response]}
 
-
+@weave.op()
 def create_entry_node(assistant_name: str) -> Callable:
     def entry_node(state: State) -> dict:
         tool_call_id = state["messages"][-1].tool_calls[0]["id"]
@@ -125,6 +128,7 @@ def create_entry_node(assistant_name: str) -> Callable:
 
     return entry_node
 
+@weave.op()
 async def ask_clarification(state: State, config: RunnableConfig):
 
     # Extract the base prompt
@@ -155,6 +159,7 @@ async def ask_clarification(state: State, config: RunnableConfig):
 
     return {"messages": [response]}
 
+@weave.op()
 async def handle_product_qa(state: State, config: RunnableConfig):
 
     # Extract the previous_conversation
@@ -192,10 +197,12 @@ async def handle_product_qa(state: State, config: RunnableConfig):
     return {"messages": [response]}
 
 class Assistant:
+    @weave.op()
     def __init__(self, prompt: str, tools: list):
         self.prompt = prompt
         self.tools = tools
 
+    @weave.op()
     async def __call__(self, state: State, config: RunnableConfig):
         while True:
 
@@ -309,7 +316,7 @@ builder.add_node(
     create_tool_node_with_fallback(order_status_safe_tools),
 )
 
-
+@weave.op()
 def route_order_status(
     state: State,
 ) -> Literal[
@@ -351,7 +358,7 @@ builder.add_node(
     create_tool_node_with_fallback(return_processing_sensitive_tools),
 )
 
-
+@weave.op()
 def route_return_processing(
     state: State,
 ) -> Literal[
@@ -377,7 +384,7 @@ builder.add_edge("return_processing_sensitive_tools", "return_processing")
 builder.add_edge("return_processing_safe_tools", "return_processing")
 builder.add_conditional_edges("return_processing", route_return_processing)
 
-
+@weave.op()
 def user_info(state: State):
     return {"user_purchase_history": get_purchase_history(state["user_id"]), "current_product": ""}
 
@@ -392,6 +399,7 @@ builder.add_node(
 )
 
 #  Add "primary_assistant_tools", if necessary
+@weave.op()
 def route_primary_assistant(
     state: State,
 ) -> Literal[
@@ -432,7 +440,7 @@ builder.add_conditional_edges(
     },
 )
 
-
+@weave.op()
 def is_order_product_valid(state: State)  -> Literal[
     "ask_clarification",
     "order_status"
@@ -442,6 +450,7 @@ def is_order_product_valid(state: State)  -> Literal[
         return "ask_clarification"
     return "order_status"
 
+@weave.op()
 def is_return_product_valid(state: State)  -> Literal[
     "ask_clarification",
     "return_processing"
@@ -477,6 +486,7 @@ pool = None
 
 # TODO: Remove pool as it's not getting used
 # WAR: It's added so postgres does not close it's session
+@weave.op()
 async def get_checkpoint():
     global memory, pool
     memory, pool = await get_checkpointer()

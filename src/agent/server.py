@@ -24,6 +24,7 @@ import time
 import prometheus_client
 import asyncio
 import random
+import weave
 import re
 from traceback import print_exc
 
@@ -44,6 +45,15 @@ from langgraph.errors import GraphRecursionError
 
 logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO').upper())
 logger = logging.getLogger(__name__)
+
+if "WANDB_API_KEY" in os.environ:
+    if "WANDB_PROJECT" in os.environ:
+        client = weave.init(os.environ.get("WANDB_PROJECT"))
+    else:
+        logger.warning("No WANDB_PROJECT env var set, using default W&B project: nv-ai-virtual-assistant")
+        client = weave.init("nv-ai-virtual-assistant")
+else:
+    logger.warning("No WANDB_API_KEY env var set, No logging to W&B")
 
 tags_metadata = [
     {
@@ -313,7 +323,7 @@ async def delete_session(session_id):
     remove_state_from_checkpointer(session_id)
     return EndSessionResponse(message="Session info deleted")
 
-
+@weave.op()
 def fallback_response_generator(sentence: str, session_id: str = ""):
     """Mock response generator to simulate streaming predefined fallback responses."""
 
@@ -350,6 +360,7 @@ def fallback_response_generator(sentence: str, session_id: str = ""):
         }
     },
 )
+@weave.op()
 async def generate_answer(request: Request,
                           prompt: Prompt) -> StreamingResponse:
     """Generate and stream the response to the provided prompt."""
@@ -577,6 +588,7 @@ async def generate_answer(request: Request,
         }
     }
 })
+@weave.op()
 async def store_last_response_feedback(
     request: Request,
     feedback: FeedbackRequest,
