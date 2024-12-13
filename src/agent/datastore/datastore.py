@@ -19,6 +19,7 @@ Baes class to store the user conversation in database permanently
 
 from typing import List, Optional
 from datetime import datetime
+import weave
 
 from src.common.utils import get_config
 from src.agent.datastore.postgres_client import PostgresClient
@@ -26,6 +27,7 @@ from src.agent.datastore.postgres_client import PostgresClient
 
 
 class Datastore:
+    @weave.op()
     def __init__(self):
         db_name = get_config().database.name
         if db_name == "postgres":
@@ -37,17 +39,21 @@ class Datastore:
         else:
             raise ValueError(f"{db_name} database in not supported. Supported type postgres")
 
+    @weave.op()
     def store_conversation(self, session_id: str, user_id: Optional[str], conversation_history: list, last_conversation_time: str, start_conversation_time: str):
         """store conversation for given details"""
         self.database.store_conversation(session_id, user_id, conversation_history, last_conversation_time, start_conversation_time)
 
+    @weave.op()
     def fetch_conversation(self, session_id: str):
         """fetch conversation for given session id"""
         self.database.fetch_conversation(session_id)
 
+    @weave.op()
     def delete_conversation(self, session_id: str):
         """Delete conversation for given session id"""
         self.database.delete_conversation(session_id)
 
+    @weave.op()
     def is_session(self, session_id: str) -> bool:
         return self.database.is_session(session_id)

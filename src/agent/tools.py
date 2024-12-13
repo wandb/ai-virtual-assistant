@@ -15,6 +15,7 @@
 import os
 from pydantic import BaseModel, Field
 import requests
+import weave
 from datetime import datetime, timedelta
 from functools import lru_cache
 from langchain_core.tools import tool
@@ -33,6 +34,7 @@ logger = logging.getLogger(__name__)
 
 @tool
 @lru_cache
+@weave.op()
 def structured_rag(query: str, user_id: str) -> str:
     """Use this for answering personalized queries about orders, returns, refunds, and account-specific issues."""
     entry_doc_search = {"query": query, "top_k": 4, "user_id": user_id}
@@ -56,6 +58,7 @@ def structured_rag(query: str, user_id: str) -> str:
 
 @tool
 @lru_cache
+@weave.op()
 def get_purchase_history(user_id: str) -> str:
     """Retrieves the recent return and order details for a user,
     including order ID, product name, status, relevant dates, quantity, and amount."""
@@ -98,6 +101,7 @@ def get_purchase_history(user_id: str) -> str:
 
 @tool
 @lru_cache
+@weave.op()
 def get_recent_return_details(user_id: str) -> str:
     """Retrieves the recent return details for a user, including order ID, product name, return status, and relevant dates."""
 
@@ -106,6 +110,7 @@ def get_recent_return_details(user_id: str) -> str:
 
 @tool
 @lru_cache
+@weave.op()
 def return_window_validation(order_date: str) -> str:
     """Use this to check the return window for validation. Use 'YYYY-MM-DD' for the order date."""
 
@@ -140,6 +145,7 @@ def return_window_validation(order_date: str) -> str:
 
 @tool
 @lru_cache
+@weave.op()
 def update_return(user_id: str, current_product: str, order_id: str) -> str:
     """Use this to update return status in the database."""
 

@@ -16,6 +16,7 @@
 """ Retriever pipeline for extracting data from structured information"""
 import logging
 import os
+import weave
 from typing import Any, Dict, List
 from urllib.parse import urlparse
 import pandas as pd
@@ -50,12 +51,13 @@ vaana_client.do_training(method="schema")
 
 class CSVChatbot(BaseExample):
     """RAG example showcasing CSV parsing using Vaana AI Agent"""
-
+    @weave.op()
     def ingest_docs(self, filepath: str, filename: str):
         """Ingest documents to the VectorDB."""
 
         raise NotImplementedError("Canonical RAG only supports document retrieval")
 
+    @weave.op()
     def document_search(self, content: str, num_docs: int, user_id: str = None, conv_history: Dict[str, str] = {}) -> List[Dict[str, Any]]:
         """Execute a Document Search."""
 
@@ -91,11 +93,13 @@ class CSVChatbot(BaseExample):
             logger.error("An error occurred during document search: %s", str(e))
             raise  # Re-raise the exception after logging
 
+    @weave.op()
     def get_documents(self) -> List[str]:
         """Retrieves filenames stored in the vector store."""
         logger.error("get_documents not implemented")
         return True
 
+    @weave.op()
     def delete_documents(self, filenames: List[str]):
         """Delete documents from the vector index."""
         logger.error("delete_documents not implemented")

@@ -72,6 +72,10 @@ applicationSpecs:
           value: '200'
         - name: NVIDIA_API_KEY
           value: ""
+        - name: WANDB_API_KEY
+          value: ""
+        - name: WANDB_PROJECT
+          value: ""
         - name: COLLECTION_NAME
           value: unstructured_data
         - name: APP_RETRIEVER_TOPK

@@ -14,3 +14,4 @@ psycopg-pool==3.2.2
 langgraph-checkpoint-postgres==2.0.0
 psycopg-binary==3.2.3
 nest-asyncio==1.6.0
+weave==0.51.24

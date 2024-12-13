@@ -18,6 +18,7 @@
 import os
 import shutil
 import logging
+import weave
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 import importlib
@@ -32,6 +33,15 @@ from pydantic import BaseModel, Field, constr
 
 logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO').upper())
 logger = logging.getLogger(__name__)
+
+if "WANDB_API_KEY" in os.environ and os.environ["WANDB_API_KEY"] != "":
+    if "WANDB_PROJECT" in os.environ and os.environ["WANDB_PROJECT"] != "":
+        client = weave.init(os.environ.get("WANDB_PROJECT"))
+    else:
+        logger.warning("No WANDB_PROJECT env var set, using default W&B project: nv-ai-virtual-assistant")
+        client = weave.init("nv-ai-virtual-assistant")
+else:
+    logger.warning("No WANDB_API_KEY env var set, No logging to W&B")
 
 tags_metadata = [
     {
@@ -164,6 +174,7 @@ def health_check():
         }
     }
 })
+@weave.op()
 async def upload_document(request: Request, file: UploadFile = File(...)) -> JSONResponse:
     """Upload a document to the vector store."""
 
@@ -205,6 +216,8 @@ async def upload_document(request: Request, file: UploadFile = File(...)) -> JSO
         }
     }
 })
+
+@weave.op()
 async def document_search(request: Request, data: DocumentSearch) -> Dict[str, List[Dict[str, Any]]]:
     """Search for the most relevant documents for the given search parameters."""
 
@@ -241,6 +254,7 @@ async def document_search(request: Request, data: DocumentSearch) -> Dict[str, L
         }
     }
 })
+@weave.op()
 async def get_documents(request: Request) -> DocumentsResponse:
     """List available documents."""
     try:
@@ -266,6 +280,7 @@ async def get_documents(request: Request) -> DocumentsResponse:
         }
     }
 })
+@weave.op()
 async def delete_document(request: Request, filename: str) -> JSONResponse:
     """Delete a document."""
     try:

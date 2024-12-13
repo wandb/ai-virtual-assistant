@@ -15,6 +15,7 @@
 
 import logging
 import os
+import weave
 from typing import Any, Dict, List
 from traceback import print_exc
 
@@ -53,6 +54,7 @@ except Exception as e:
 
 
 class UnstructuredRetriever(BaseExample):
+    @weave.op()
     def ingest_docs(self, filepath: str, filename: str) -> None:
         """Ingests documents to the VectorDB.
         It's called when the POST endpoint of `/documents` API is invoked.
@@ -89,7 +91,7 @@ class UnstructuredRetriever(BaseExample):
             logger.error(f"Failed to ingest document due to exception {e}")
             raise ValueError("Failed to upload document. Please upload an unstructured text document.")
 
-
+    @weave.op()
     def document_search(self, content: str, num_docs: int, conv_history: Dict[str, str] = {}) -> List[Dict[str, Any]]:
         """Search for the most relevant documents for the given search parameters.
         It's called when the `/search` API is invoked.
@@ -172,7 +174,7 @@ class UnstructuredRetriever(BaseExample):
 
         return []
 
-
+    @weave.op()
     def get_documents(self) -> List[str]:
         """Retrieves filenames stored in the vector store.
         It's called when the GET endpoint of `/documents` API is invoked.
@@ -188,7 +190,7 @@ class UnstructuredRetriever(BaseExample):
             logger.error(f"Vectorstore not initialized. Error details: {e}")
         return []
 
-
+    @weave.op()
     def delete_documents(self, filenames: List[str]) -> bool:
         """Delete documents from the vector index.
         It's called when the DELETE endpoint of `/documents` API is invoked.

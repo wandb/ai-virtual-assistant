@@ -23,6 +23,7 @@ from sqlalchemy import create_engine, Column, String, DateTime, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+import weave
 import json
 import os
 
@@ -51,10 +52,12 @@ class ConversationHistory(Base):
     conversation_data = Column(JSON)
 
 class PostgresClient:
+    @weave.op()
     def __init__(self):
         self.engine = engine
         Base.metadata.create_all(self.engine)
 
+    @weave.op()
     def store_conversation(self, session_id: str, user_id: Optional[str], conversation_history: list, last_conversation_time: str, start_conversation_time: str):
         session = Session()
         try:
@@ -74,6 +77,7 @@ class PostgresClient:
         finally:
             session.close()
 
+    @weave.op()
     def fetch_conversation(self, session_id: str):
         session = Session()
         try:
@@ -92,6 +96,7 @@ class PostgresClient:
         finally:
             session.close()
 
+    @weave.op()
     def delete_conversation(self, session_id: str):
         session = Session()
         try:
@@ -108,6 +113,7 @@ class PostgresClient:
         finally:
             session.close()
 
+    @weave.op()
     def is_session(self, session_id: str) -> bool:
         session = Session()
         try:
