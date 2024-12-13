@@ -33,10 +33,11 @@ as well as a platform to iterate on it to bring it to production. The following 
 This should provide you with the data to be successful in your implementation of this Agent blueprint all the way to production.
 The integration is activated when setting `WANDB_API_KEY` when deploying the blueprint in the docker compose or the helm charts (modifying the values file).
 
-NOTE: By default, tracing is logged to your default team in W&B, under project `nv-ai-virtual-assistant`. 
-You can override this by setting `WANDB_PROJECT` as well.
+NOTE: 
+- By default, tracing is logged to your default team in W&B, under project `nv-ai-virtual-assistant`. You can override this by setting `WANDB_PROJECT` as well.
+- Milvus is running in CPU mode here for ease of stand-up locally
 
-This repository has been largely intact from the source. The documentation below is the original.
+This repository has been left largely intact from the source. The documentation below is the original.
 
 ## Table of Contents
 - [Table of Contents](#table-of-contents)
