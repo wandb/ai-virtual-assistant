@@ -16,6 +16,7 @@
 """Utility functions used across different modules of NIM Blueprints."""
 import os
 import yaml
+import weave
 import logging
 from pathlib import Path
 from functools import lru_cache, wraps
@@ -70,6 +71,7 @@ if TYPE_CHECKING:
 
 DEFAULT_MAX_CONTEXT = 1500
 
+@weave.op()
 def utils_cache(func: Callable) -> Callable:
     """Use this to convert unhashable args to hashable ones"""
     @wraps(func)
@@ -82,6 +84,7 @@ def utils_cache(func: Callable) -> Callable:
 
 
 @lru_cache
+@weave.op()
 def get_config() -> "ConfigWizard":
     """Parse the application configuration."""
     config_file = os.environ.get("APP_CONFIG_FILE", "/dev/null")
@@ -92,6 +95,7 @@ def get_config() -> "ConfigWizard":
 
 
 @lru_cache
+@weave.op()
 def get_prompts() -> Dict:
     """Retrieves prompt configurations from YAML file and return a dict.
     """
@@ -116,7 +120,7 @@ def get_prompts() -> Dict:
     return config
 
 
-
+@weave.op()
 def create_vectorstore_langchain(document_embedder, collection_name: str = "") -> VectorStore:
     """Create the vector db index for langchain."""
 
@@ -153,7 +157,7 @@ def create_vectorstore_langchain(document_embedder, collection_name: str = "") -
     logger.info("Vector store created and saved.")
     return vectorstore
 
-
+@weave.op()
 def get_vectorstore(vectorstore, document_embedder) -> VectorStore:
     """
     Send a vectorstore object.
@@ -166,6 +170,7 @@ def get_vectorstore(vectorstore, document_embedder) -> VectorStore:
 
 @utils_cache
 @lru_cache()
+@weave.op()
 def get_llm(**kwargs) -> LLM | SimpleChatModel:
     """Create the LLM connection."""
     settings = get_config()
@@ -193,6 +198,7 @@ def get_llm(**kwargs) -> LLM | SimpleChatModel:
 
 
 @lru_cache
+@weave.op()
 def get_embedding_model() -> Embeddings:
     """Create the embedding model."""
     settings = get_config()
@@ -222,6 +228,7 @@ def get_embedding_model() -> Embeddings:
         raise RuntimeError("Unable to find any supported embedding model. Supported engine is huggingface and nvidia-ai-endpoints.")
 
 @lru_cache
+@weave.op()
 def get_ranking_model() -> BaseDocumentCompressor:
     """Create the ranking model.
 
@@ -247,7 +254,7 @@ def get_ranking_model() -> BaseDocumentCompressor:
         logger.error(f"An error occurred while initializing ranking_model: {e}")
     return None
 
-
+@weave.op()
 def get_text_splitter() -> SentenceTransformersTokenTextSplitter:
     """Return the token text splitter instance from langchain."""
 
@@ -260,7 +267,7 @@ def get_text_splitter() -> SentenceTransformersTokenTextSplitter:
         chunk_overlap=get_config().text_splitter.chunk_overlap,
     )
 
-
+@weave.op()
 def get_docs_vectorstore_langchain(vectorstore: VectorStore) -> List[str]:
     """Retrieves filenames stored in the vector store implemented in LangChain."""
 
@@ -289,6 +296,7 @@ def get_docs_vectorstore_langchain(vectorstore: VectorStore) -> List[str]:
         logger.error(f"Error occurred while retrieving documents: {e}")
     return []
 
+@weave.op()
 def del_docs_vectorstore_langchain(vectorstore: VectorStore, filenames: List[str]) -> bool:
     """Delete documents from the vector index implemented in LangChain."""
 
@@ -333,6 +341,7 @@ def del_docs_vectorstore_langchain(vectorstore: VectorStore, filenames: List[str
         return False
     return True
 
+@weave.op()
 def _combine_dicts(dict_a, dict_b):
     """Combines two dictionaries recursively, prioritizing values from dict_b.
 

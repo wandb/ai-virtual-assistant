@@ -42,6 +42,8 @@ services:
       CANONICAL_RAG_URL: http://unstructured-retriever:8081
       STRUCTURED_RAG_URI: http://structured-retriever:8081
       NVIDIA_API_KEY: ${NVIDIA_API_KEY}
+      WANDB_API_KEY: ${WANDB_API_KEY}
+      WANDB_PROJECT: ${WANDB_PROJECT}
       GRAPH_RECURSION_LIMIT: 20
       GRAPH_TIMEOUT_IN_SEC: 20
       RETURN_WINDOW_CURRENT_DATE: '2024-10-23' # Leave it empty to get the current date
@@ -177,6 +179,8 @@ services:
       APP_TEXTSPLITTER_CHUNKSIZE: 506
       APP_TEXTSPLITTER_CHUNKOVERLAP: 200
       NVIDIA_API_KEY: ${NVIDIA_API_KEY}
+      WANDB_API_KEY: ${WANDB_API_KEY}
+      WANDB_PROJECT: ${WANDB_PROJECT}
       # vectorstore collection name to store embeddings
       COLLECTION_NAME: ${COLLECTION_NAME:-unstructured_data}
       APP_RETRIEVER_TOPK: 4
@@ -216,6 +220,8 @@ services:
       APP_PROMPTS_CHATTEMPLATE: "You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Please ensure that your responses are positive in nature."
       APP_PROMPTS_RAGTEMPLATE: "You are a helpful AI assistant named Envie. You will reply to questions only based on the context that you are provided. If something is out of context, you will refrain from replying and politely decline to respond to the user."
       NVIDIA_API_KEY: ${NVIDIA_API_KEY}
+      WANDB_API_KEY: ${WANDB_API_KEY}
+      WANDB_PROJECT: ${WANDB_PROJECT}
       COLLECTION_NAME: ${COLLECTION_NAME:-structured_data}
       APP_VECTORSTORE_URL: "http://milvus:19530"
       APP_VECTORSTORE_NAME: "milvus"
@@ -347,7 +353,7 @@ services:
 
   milvus:
     container_name: milvus-standalone
-    image: milvusdb/milvus:v2.4.15-gpu
+    image: milvusdb/milvus:v2.4.15
     command: ["milvus", "run", "standalone"]
     environment:
       ETCD_ENDPOINTS: etcd:2379
@@ -369,13 +375,6 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              capabilities: ["gpu"]
-              device_ids: ['${VECTORSTORE_GPU_DEVICE_ID:-0}']
 
 
 networks:

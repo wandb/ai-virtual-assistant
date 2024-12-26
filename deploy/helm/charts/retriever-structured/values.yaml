@@ -61,6 +61,10 @@ applicationSpecs:
             to the user.
         - name: NVIDIA_API_KEY
           value: ""
+        - name: WANDB_API_KEY
+          value: ""
+        - name: WANDB_PROJECT
+          value: ""
         - name: COLLECTION_NAME
           value: structured_data
         - name: APP_DATABASE_NAME

@@ -80,6 +80,10 @@ applicationSpecs:
           value: http://$egress.chain-server-structured.address:$egress.chain-server-structured.port
         - name: NVIDIA_API_KEY
           value: ""
+        - name: WANDB_API_KEY
+          value: ""
+        - name: WANDB_PROJECT
+          value: ""
         - name: GRAPH_RECURSION_LIMIT
           value: '20'
         - name: RETURN_WINDOW_CURRENT_DATE

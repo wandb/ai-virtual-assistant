@@ -20,22 +20,24 @@ based on session_id using python dict
 
 from typing import List, Optional, Dict
 import time
+import weave
 
 class LocalCache:
     # Maintain conversation history session_id: List[]
     conversation_hist = {}
 
     # TODO: Create API to get last k conversation from database instead of returning everything
+    @weave.op()
     def get_conversation(self, session_id: str) -> List:
         return self.conversation_hist.get(session_id, {}).get("conversation_hist", [])
 
-
+    @weave.op()
     def get_k_conversation(self, session_id: str, k_turn: Optional[int] = None) -> List:
         if not k_turn:
             return self.conversation_hist.get(session_id, {}).get("conversation_hist", [])
         return self.conversation_hist.get(session_id, {}).get("conversation_hist", [])[-k_turn:]
 
-
+    @weave.op()
     def save_conversation(self, session_id: str, user_id: Optional[str], conversation: List) -> bool:
         try:
             self.conversation_hist[session_id] = {
@@ -48,17 +50,17 @@ class LocalCache:
             print(f"Failed to save conversation due to exception {e}")
             return False
 
-
+    @weave.op()
     def is_session(self, session_id: str) -> bool:
         """Check if session_id already exist in database"""
         return session_id in self.conversation_hist
 
-
+    @weave.op()
     def get_session_info(self, session_id: str) -> Dict:
         """Retrieve complete session information from database"""
         return self.conversation_hist.get(session_id, {})
 
-
+    @weave.op()
     def response_feedback(self, session_id: str, response_feedback: float) -> bool:
         try:
             session = self.conversation_hist.get(session_id, {})
@@ -80,7 +82,7 @@ class LocalCache:
             print(f"Unexpected error while storing user feedback: {e}")
             return False
 
-
+    @weave.op()
     def delete_conversation(self, session_id: str) -> bool:
         """Delete conversation for given session id"""
         if session_id in self.conversation_hist:
@@ -91,7 +93,7 @@ class LocalCache:
             print(f"No conversation history found for session ID: {session_id}")
             return False
 
-
+    @weave.op()
     def create_session(self, session_id: str, user_id: str = ""):
         """Create a entry for given session id"""
         try:
