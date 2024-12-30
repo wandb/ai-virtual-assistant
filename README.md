@@ -17,7 +17,7 @@ limitations under the License.
 
 <h1><img align="center" src="https://github.com/user-attachments/assets/cbe0d62f-c856-4e0b-b3ee-6184b7c4d96f">NVIDIA AI Blueprint: AI Virtual Assistant for Customer Service with Weights & Biases Weave</h1>
 
-## W&B Integration of the AI Virtual Assistant
+## W&B Weave Integration of the AI Virtual Assistant
 
 <p align="center">
 <img src="./docs/imgs/weave-evals.png" width="750">
@@ -35,7 +35,9 @@ The integration is activated when setting `WANDB_API_KEY` when deploying the blu
 
 NOTE: 
 - By default, tracing is logged to your default team in W&B, under project `nv-ai-virtual-assistant`. You can override this by setting `WANDB_PROJECT` as well.
-- Milvus is running in CPU mode in the docker compose for ease of stand-up locally
+- Milvus is running in GPU mode in the docker compose for the brev launchable performance. To run this locally:
+  - change `milvusdb/milvus:v2.4.15-gpu` to `milvusdb/milvus:v2.4.15` in `deploy/compose/docker-compose.yaml` in the milvus section.
+  - Remove the section `deploy` under the milvus section.
 - Ensure to set `WANDB_API_KEY` and `WANDB_PROJECT` in the values.yaml file for the helm deployment.
 
 This repository has been left largely intact from the source. The documentation below is the original.
