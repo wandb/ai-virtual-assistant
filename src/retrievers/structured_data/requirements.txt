@@ -8,4 +8,4 @@ dataclass-wizard==0.22.3
 numexpr==2.9.0
 psycopg2-binary==2.9.9
 vanna[postgres,milvus]==0.7.5
-weave==0.51.24
+weave==0.51.27
