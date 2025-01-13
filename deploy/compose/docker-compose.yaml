@@ -16,7 +16,7 @@ services:
     command: --port 8081 --host 0.0.0.0 --workers 1 --loop asyncio
     environment:
       EXAMPLE_PATH: './src/agent'
-      APP_LLM_MODELNAME: ${APP_LLM_MODELNAME:-"meta/llama-3.1-70b-instruct"}
+      APP_LLM_MODELNAME: ${APP_LLM_MODELNAME:-"meta/llama-3.3-70b-instruct"}
       APP_LLM_MODELENGINE: nvidia-ai-endpoints
       APP_LLM_SERVERURL: ${APP_LLM_SERVERURL:-""}
       # Cache name to store user conversation
@@ -107,7 +107,7 @@ services:
     command: --port 8081 --host 0.0.0.0 --workers 1
     environment:
       EXAMPLE_PATH: './src/analytics'
-      APP_LLM_MODELNAME: ${APP_LLM_MODELNAME:-"meta/llama-3.1-70b-instruct"}
+      APP_LLM_MODELNAME: ${APP_LLM_MODELNAME:-"meta/llama-3.3-70b-instruct"}
       APP_LLM_MODELENGINE: nvidia-ai-endpoints
       APP_LLM_SERVERURL: ${APP_LLM_SERVERURL:-""}
       # Database name to store user conversation/summary
@@ -159,7 +159,7 @@ services:
       # Type of vectordb used to store embedding supported type milvus, pgvector
       APP_VECTORSTORE_NAME: "milvus"
       # url on which llm model is hosted. If "", Nvidia hosted API is used
-      APP_LLM_MODELNAME: ${APP_LLM_MODELNAME:-"meta/llama-3.1-70b-instruct"}
+      APP_LLM_MODELNAME: ${APP_LLM_MODELNAME:-"meta/llama-3.3-70b-instruct"}
       # embedding model engine used for inference, supported type nvidia-ai-endpoints, huggingface
       APP_LLM_MODELENGINE: nvidia-ai-endpoints
       # url on which llm model is hosted. If "", Nvidia hosted API is used
@@ -169,7 +169,7 @@ services:
       APP_EMBEDDINGS_MODELENGINE: ${APP_EMBEDDINGS_MODELENGINE:-nvidia-ai-endpoints}
       # url on which embedding model is hosted. If "", Nvidia hosted API is used
       APP_EMBEDDINGS_SERVERURL: ${APP_EMBEDDINGS_SERVERURL:-""}
-      APP_RANKING_MODELNAME: ${APP_RANKING_MODELNAME:-"nvidia/nv-rerankqa-mistral-4b-v3"} # Leave it blank to avoid using ranking
+      APP_RANKING_MODELNAME: ${APP_RANKING_MODELNAME:-"nvidia/llama-3.2-nv-rerankqa-1b-v2"} # Leave it blank to avoid using ranking
       # ranking engine used for inference, supported type nvidia-ai-endpoints
       APP_RANKING_MODELENGINE: ${APP_RANKING_MODELENGINE:-nvidia-ai-endpoints}
       # url on which re-ranking model is hosted. If "", Nvidia hosted API is used
@@ -211,7 +211,7 @@ services:
     command: --port 8081 --host 0.0.0.0 --workers 1
     environment:
       EXAMPLE_PATH: 'src/retrievers/structured_data'
-      APP_LLM_MODELNAME: ${APP_LLM_MODELNAME:-meta/llama-3.1-70b-instruct}
+      APP_LLM_MODELNAME: ${APP_LLM_MODELNAME:-meta/llama-3.3-70b-instruct}
       APP_LLM_MODELENGINE: nvidia-ai-endpoints
       APP_LLM_SERVERURL: ${APP_LLM_SERVERURL:-""}
       APP_EMBEDDINGS_MODELNAME: ${APP_EMBEDDINGS_MODELNAME:-nvidia/nv-embedqa-e5-v5}
